@@ -62,6 +62,11 @@ const Home: React.FC = () => {
   const handleEditProduct = (productId: string) => {
     setEditingProduct(productId);
   };
+
+  const handleDuplicateProduct = (product: Product) => {
+    const { id, ...productWithoutId } = product;
+    addProduct(productWithoutId);
+  };
   
   const productBeingEdited = editingProduct 
     ? currentShipment.products.find(p => p.id === editingProduct)
@@ -141,6 +146,7 @@ const Home: React.FC = () => {
                           key={product.id} 
                           product={product} 
                           onEdit={handleEditProduct}
+                          onDuplicate={handleDuplicateProduct}
                         />
                       ))}
                     </div>

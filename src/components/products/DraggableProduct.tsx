@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Package, Edit2 } from 'lucide-react';
+import { Package, Edit2, Copy } from 'lucide-react';
 import { Product } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { formatCurrency } from '../../utils/calculations';
@@ -8,9 +8,10 @@ import { formatCurrency } from '../../utils/calculations';
 interface DraggableProductProps {
   product: Product;
   onEdit: (id: string) => void;
+  onDuplicate?: (product: Product) => void;
 }
 
-const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) => {
+const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit, onDuplicate }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: product.id,
   });
@@ -42,12 +43,22 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
         </div>
       </div>
       
-      <button
-        onClick={() => onEdit(product.id)}
-        className="flex-shrink-0 p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-md hover:bg-gray-100"
-      >
-        <Edit2 className="h-4 w-4" />
-      </button>
+      <div className="flex-shrink-0 flex gap-1">
+        <button
+          onClick={() => onDuplicate?.(product)}
+          className="p-2 text-gray-400 hover:text-green-600 transition-colors rounded-md hover:bg-gray-100"
+          title="Duplicate product"
+        >
+          <Copy className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onEdit(product.id)}
+          className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-md hover:bg-gray-100"
+          title="Edit product"
+        >
+          <Edit2 className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 };
