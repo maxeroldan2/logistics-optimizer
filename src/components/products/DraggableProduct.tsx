@@ -16,10 +16,12 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit, on
     id: product.id,
   });
   
-  const { config } = useAppContext();
+  const { config, currentShipment } = useAppContext();
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
   } : undefined;
+
+  const container = currentShipment?.containers.find(c => c.id === product.containerId);
   
   return (
     <div className="flex items-center gap-2">
@@ -38,6 +40,11 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit, on
             <div className="font-medium text-gray-900">{product.name}</div>
             <div className="text-sm text-gray-500">
               Qty: {product.quantity} • {formatCurrency(product.resalePrice, config.currency)}
+              {container && (
+                <span className="ml-2 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs">
+                  {container.name}
+                </span>
+              )}
             </div>
           </div>
         </div>
