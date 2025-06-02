@@ -11,7 +11,7 @@ interface DraggableProductProps {
 }
 
 const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: product.id,
   });
   
@@ -21,36 +21,33 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
   } : undefined;
   
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      className={`p-3 rounded-lg border transition-all ${
-        isDragging 
-          ? 'border-blue-500 shadow-lg bg-blue-50' 
-          : 'border-gray-200 hover:border-blue-300 hover:shadow'
-      }`}
-    >
-      <div className="flex items-center space-x-3">
-        <div 
-          {...listeners}
-          className="flex-shrink-0 cursor-move"
-        >
-          <Package className="h-5 w-5 text-blue-600" />
-        </div>
-        <div className="flex-grow">
-          <div className="font-medium text-gray-900">{product.name}</div>
-          <div className="text-sm text-gray-500">
-            Qty: {product.quantity} • {formatCurrency(product.resalePrice, config.currency)}
+    <div className="flex items-center gap-2">
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="flex-grow p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow cursor-move bg-white"
+      >
+        <div className="flex items-center space-x-3">
+          <div className="flex-shrink-0">
+            <Package className="h-5 w-5 text-blue-600" />
+          </div>
+          <div className="flex-grow">
+            <div className="font-medium text-gray-900">{product.name}</div>
+            <div className="text-sm text-gray-500">
+              Qty: {product.quantity} • {formatCurrency(product.resalePrice, config.currency)}
+            </div>
           </div>
         </div>
-        <button
-          onClick={() => onEdit(product.id)}
-          className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition-colors"
-        >
-          <Edit2 className="h-4 w-4" />
-        </button>
       </div>
+      
+      <button
+        onClick={() => onEdit(product.id)}
+        className="flex-shrink-0 p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-md hover:bg-gray-100"
+      >
+        <Edit2 className="h-4 w-4" />
+      </button>
     </div>
   );
 };
