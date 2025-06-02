@@ -16,15 +16,16 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
   });
   
   const { config } = useAppContext();
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    zIndex: isDragging ? 999 : undefined,
-  } : undefined;
   
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        position: 'relative',
+        touchAction: 'none',
+        zIndex: isDragging ? 999 : undefined
+      }}
       {...listeners}
       {...attributes}
       className={`p-3 rounded-lg border transition-all cursor-grab active:cursor-grabbing ${
@@ -49,7 +50,8 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
             e.stopPropagation();
             onEdit(product.id);
           }}
-          className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition-colors cursor-pointer"
+          className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition-colors cursor-pointer z-10"
+          style={{ touchAction: 'none' }}
         >
           <Edit2 className="h-4 w-4" />
         </button>
