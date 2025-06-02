@@ -52,3 +52,5 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     </div>
   );
 };
+
+export default ConfirmDialog
