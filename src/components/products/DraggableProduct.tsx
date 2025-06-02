@@ -24,6 +24,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
     <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
       className={`p-3 rounded-lg border transition-all ${
         isDragging 
           ? 'border-blue-500 shadow-lg bg-blue-50' 
@@ -32,8 +33,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
     >
       <div className="flex items-center space-x-3">
         <div 
-          {...listeners} 
-          {...attributes}
+          {...listeners}
           className="flex-shrink-0 cursor-move"
         >
           <Package className="h-5 w-5 text-blue-600" />
