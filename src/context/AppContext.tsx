@@ -26,22 +26,11 @@ const defaultConfig: GlobalConfig = {
   showTooltips: true
 };
 
-const defaultContainer: Container = {
-  id: uuidv4(),
-  name: 'Default Container',
-  height: 100,
-  width: 100,
-  length: 100,
-  maxWeight: 100,
-  shippingCost: 0,
-  products: []
-};
-
 const defaultShipment: Shipment = {
   id: uuidv4(),
   name: 'New Shipment',
   products: [],
-  containers: [defaultContainer],
+  containers: [],
   createdAt: new Date(),
   isPremium: false
 };
