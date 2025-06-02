@@ -6,23 +6,32 @@ import { useAppContext } from '../../context/AppContext';
 
 interface ProductFormProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
+  onUpdateProduct?: (id: string, updates: Partial<Product>) => void;
+  product?: Product;
+  onClose?: () => void;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ 
+  onAddProduct, 
+  onUpdateProduct,
+  product: initialProduct,
+  onClose 
+}) => {
   const { config } = useAppContext();
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(!initialProduct);
   
   const [product, setProduct] = useState<Omit<Product, 'id'>>({
-    name: '',
-    height: 0,
-    width: 0,
-    length: 0,
-    weight: 0,
-    purchasePrice: 0,
-    resalePrice: 0,
-    daysToSell: 7,
-    quantity: 1,
-    isBoxed: false
+    name: initialProduct?.name || '',
+    height: initialProduct?.height || 0,
+    width: initialProduct?.width || 0,
+    length: initialProduct?.length || 0,
+    weight: initialProduct?.weight || 0,
+    purchasePrice: initialProduct?.purchasePrice || 0,
+    resalePrice: initialProduct?.resalePrice || 0,
+    daysToSell: initialProduct?.daysToSell || 7,
+    quantity: initialProduct?.quantity || 1,
+    isBoxed: initialProduct?.isBoxed || false,
+    containerId: initialProduct?.containerId
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,20 +45,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAddProduct(product);
-    setProduct({
-      name: '',
-      height: 0,
-      width: 0,
-      length: 0,
-      weight: 0,
-      purchasePrice: 0,
-      resalePrice: 0,
-      daysToSell: 7,
-      quantity: 1,
-      isBoxed: false
-    });
-    setIsFormOpen(false);
+    
+    if (initialProduct && onUpdateProduct) {
+      onUpdateProduct(initialProduct.id, product);
+      onClose?.();
+    } else {
+      onAddProduct(product);
+      setProduct({
+        name: '',
+        height: 0,
+        width: 0,
+        length: 0,
+        weight: 0,
+        purchasePrice: 0,
+        resalePrice: 0,
+        daysToSell: 7,
+        quantity: 1,
+        isBoxed: false
+      });
+      setIsFormOpen(false);
+    }
   };
   
   const getUnitLabel = (type: 'dimension' | 'weight') => {
@@ -60,7 +75,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
     }
   };
   
-  if (!isFormOpen) {
+  if (!isFormOpen && !initialProduct) {
     return (
       <button
         onClick={() => setIsFormOpen(true)}
@@ -77,9 +92,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 animate-fade-in">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Add New Product</h3>
+        <h3 className="text-lg font-semibold text-gray-800">
+          {initialProduct ? 'Edit Product' : 'Add New Product'}
+        </h3>
         <button 
-          onClick={() => setIsFormOpen(false)}
+          onClick={() => initialProduct ? onClose?.() : setIsFormOpen(false)}
           className="text-gray-400 hover:text-gray-600"
         >
           <X size={20} />
@@ -301,7 +318,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
         <div className="mt-6 flex justify-end">
           <button
             type="button"
-            onClick={() => setIsFormOpen(false)}
+            onClick={() => initialProduct ? onClose?.() : setIsFormOpen(false)}
             className="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 
                      shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white 
                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 
@@ -316,7 +333,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
                      hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
                      focus:ring-blue-500"
           >
-            Add Product
+            {initialProduct ? 'Save Changes' : 'Add Product'}
           </button>
         </div>
       </form>

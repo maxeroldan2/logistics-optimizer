@@ -29,6 +29,7 @@ const Home: React.FC = () => {
   
   const [showSettings, setShowSettings] = useState(false);
   const [showNewContainerForm, setShowNewContainerForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<string | null>(null);
   
   React.useEffect(() => {
     if (!currentShipment) {
@@ -59,6 +60,14 @@ const Home: React.FC = () => {
   };
   
   const shipmentScore = calculateShipmentScore(currentShipment.products, currentShipment.containers);
+  
+  const handleEditProduct = (productId: string) => {
+    setEditingProduct(productId);
+  };
+  
+  const productBeingEdited = editingProduct 
+    ? currentShipment.products.find(p => p.id === editingProduct)
+    : undefined;
   
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -133,7 +142,15 @@ const Home: React.FC = () => {
                     </div>
                     
                     <div className="mt-4">
-                      <ProductForm onAddProduct={addProduct} />
+                      {editingProduct ? (
+                        <ProductForm 
+                          product={productBeingEdited}
+                          onUpdateProduct={updateProduct}
+                          onClose={() => setEditingProduct(null)}
+                        />
+                      ) : (
+                        <ProductForm onAddProduct={addProduct} />
+                      )}
                     </div>
                   </div>
                 </div>
