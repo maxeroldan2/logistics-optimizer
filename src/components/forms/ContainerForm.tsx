@@ -36,11 +36,15 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
     
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
+      [name]: type === 'number' ? Number(value) : value
     }));
   };
   
   const handleSubmit = () => {
+    if (!formData.name.trim()) {
+      return;
+    }
+    
     if (container && onUpdateContainer) {
       onUpdateContainer(formData);
       setIsEditMode(false);
@@ -173,13 +177,15 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="col-span-2">
           <label className="block text-sm font-medium text-gray-700">
-            Container Name
+            Container Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            required
+            placeholder="Enter container name"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
                      focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
@@ -307,10 +313,11 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
         )}
         <button
           onClick={handleSubmit}
+          disabled={!formData.name.trim()}
           className="inline-flex justify-center py-2 px-4 border border-transparent 
                    shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 
                    hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                   focus:ring-blue-500"
+                   focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {container ? 'Save Changes' : 'Add Container'}
         </button>
