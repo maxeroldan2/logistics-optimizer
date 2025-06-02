@@ -24,12 +24,14 @@ const Home: React.FC = () => {
     removeProduct,
     addContainer,
     updateContainer,
+    removeContainer,
     isPremiumUser
   } = useAppContext();
   
   const [showSettings, setShowSettings] = useState(false);
   const [showNewContainerForm, setShowNewContainerForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
+  const [editingContainer, setEditingContainer] = useState<string | null>(null);
   
   React.useEffect(() => {
     if (!currentShipment) {
@@ -67,9 +69,17 @@ const Home: React.FC = () => {
     const { id, ...productWithoutId } = product;
     addProduct(productWithoutId);
   };
+
+  const handleEditContainer = (container: Container) => {
+    setEditingContainer(container.id);
+  };
   
   const productBeingEdited = editingProduct 
     ? currentShipment.products.find(p => p.id === editingProduct)
+    : undefined;
+
+  const containerBeingEdited = editingContainer
+    ? currentShipment.containers.find(c => c.id === editingContainer)
     : undefined;
   
   const shipmentScore = calculateShipmentScore(currentShipment.products, currentShipment.containers);
@@ -120,17 +130,29 @@ const Home: React.FC = () => {
                           key={container.id}
                           container={container}
                           products={currentShipment.products}
+                          onEdit={handleEditContainer}
+                          onDelete={removeContainer}
                         />
                       ))}
                     </div>
                     
-                    {showNewContainerForm && (
+                    {(showNewContainerForm || containerBeingEdited) && (
                       <ContainerForm
+                        container={containerBeingEdited}
                         onAddContainer={container => {
                           addContainer(container);
                           setShowNewContainerForm(false);
                         }}
-                        onCancel={() => setShowNewContainerForm(false)}
+                        onUpdateContainer={updates => {
+                          if (containerBeingEdited) {
+                            updateContainer(containerBeingEdited.id, updates);
+                            setEditingContainer(null);
+                          }
+                        }}
+                        onCancel={() => {
+                          setShowNewContainerForm(false);
+                          setEditingContainer(null);
+                        }}
                       />
                     )}
                   </div>
@@ -147,6 +169,7 @@ const Home: React.FC = () => {
                           product={product} 
                           onEdit={handleEditProduct}
                           onDuplicate={handleDuplicateProduct}
+                          onDelete={removeProduct}
                         />
                       ))}
                     </div>
