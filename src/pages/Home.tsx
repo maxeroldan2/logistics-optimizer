@@ -59,8 +59,6 @@ const Home: React.FC = () => {
     }
   };
   
-  const shipmentScore = calculateShipmentScore(currentShipment.products, currentShipment.containers);
-  
   const handleEditProduct = (productId: string) => {
     setEditingProduct(productId);
   };
@@ -68,6 +66,8 @@ const Home: React.FC = () => {
   const productBeingEdited = editingProduct 
     ? currentShipment.products.find(p => p.id === editingProduct)
     : undefined;
+  
+  const shipmentScore = calculateShipmentScore(currentShipment.products, currentShipment.containers);
   
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -137,7 +137,11 @@ const Home: React.FC = () => {
                     
                     <div className="space-y-4">
                       {currentShipment.products.map(product => (
-                        <DraggableProduct key={product.id} product={product} />
+                        <DraggableProduct 
+                          key={product.id} 
+                          product={product} 
+                          onEdit={handleEditProduct}
+                        />
                       ))}
                     </div>
                     
@@ -145,7 +149,10 @@ const Home: React.FC = () => {
                       {editingProduct ? (
                         <ProductForm 
                           product={productBeingEdited}
-                          onUpdateProduct={updateProduct}
+                          onUpdateProduct={(id, updates) => {
+                            updateProduct(id, updates);
+                            setEditingProduct(null);
+                          }}
                           onClose={() => setEditingProduct(null)}
                         />
                       ) : (

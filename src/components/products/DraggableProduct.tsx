@@ -1,15 +1,16 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Package } from 'lucide-react';
+import { Package, Edit2 } from 'lucide-react';
 import { Product } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { formatCurrency } from '../../utils/calculations';
 
 interface DraggableProductProps {
   product: Product;
+  onEdit: (id: string) => void;
 }
 
-const DraggableProduct: React.FC<DraggableProductProps> = ({ product }) => {
+const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: product.id,
   });
@@ -23,16 +24,18 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product }) => {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className={`p-3 rounded-lg border cursor-move transition-all ${
+      className={`p-3 rounded-lg border transition-all ${
         isDragging 
           ? 'border-blue-500 shadow-lg bg-blue-50' 
           : 'border-gray-200 hover:border-blue-300 hover:shadow'
       }`}
     >
       <div className="flex items-center space-x-3">
-        <div className="flex-shrink-0">
+        <div 
+          {...listeners} 
+          {...attributes}
+          className="flex-shrink-0 cursor-move"
+        >
           <Package className="h-5 w-5 text-blue-600" />
         </div>
         <div className="flex-grow">
@@ -41,6 +44,12 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product }) => {
             Qty: {product.quantity} • {formatCurrency(product.resalePrice, config.currency)}
           </div>
         </div>
+        <button
+          onClick={() => onEdit(product.id)}
+          className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition-colors"
+        >
+          <Edit2 className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
