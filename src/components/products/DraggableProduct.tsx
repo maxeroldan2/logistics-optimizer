@@ -25,6 +25,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
     <div
       ref={setNodeRef}
       style={style}
+      {...listeners}
       {...attributes}
       className={`p-3 rounded-lg border transition-all cursor-grab active:cursor-grabbing ${
         isDragging 
@@ -33,10 +34,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
       }`}
     >
       <div className="flex items-center space-x-3">
-        <div 
-          {...listeners}
-          className="flex-shrink-0"
-        >
+        <div className="flex-shrink-0">
           <Package className="h-5 w-5 text-blue-600" />
         </div>
         <div className="flex-grow">
@@ -47,6 +45,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({ product, onEdit }) 
         </div>
         <button
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             onEdit(product.id);
           }}
