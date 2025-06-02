@@ -39,7 +39,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     
     setProduct(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value
+      [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) : value
     }));
   };
   
