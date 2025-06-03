@@ -53,36 +53,40 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
 
     const loadUserSettings = async () => {
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error loading user settings:', error);
-        return;
-      }
-
-      if (data) {
-        setConfig({
-          measurement: data.measurement,
-          currency: data.currency,
-          language: data.language,
-          showTooltips: data.show_tooltips
-        });
-      } else {
-        // Create default settings for new user
-        const { error: insertError } = await supabase
+      try {
+        const { data, error } = await supabase
           .from('user_settings')
-          .insert({
-            user_id: user.id,
-            ...defaultConfig
-          });
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-        if (insertError) {
-          console.error('Error creating user settings:', insertError);
+        if (error) {
+          console.error('Error loading user settings:', error);
+          return;
         }
+
+        if (data) {
+          setConfig({
+            measurement: data.measurement,
+            currency: data.currency,
+            language: data.language,
+            showTooltips: data.show_tooltips
+          });
+        } else {
+          // Create default settings for new user
+          const { error: insertError } = await supabase
+            .from('user_settings')
+            .insert({
+              user_id: user.id,
+              ...defaultConfig
+            });
+
+          if (insertError) {
+            console.error('Error creating user settings:', insertError);
+          }
+        }
+      } catch (error) {
+        console.error('Error in loadUserSettings:', error);
       }
     };
 
