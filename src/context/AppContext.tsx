@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { GlobalConfig, Product, Container, Shipment } from '../types';
 import { calculateShipmentScore, calculateProductScore } from '../utils/calculations';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../components/auth/AuthProvider';
 
 interface AppContextType {
   config: GlobalConfig;
@@ -38,12 +40,74 @@ const defaultShipment: Shipment = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [config, setConfig] = useState<GlobalConfig>(defaultConfig);
   const [currentShipment, setCurrentShipment] = useState<Shipment | null>(null);
   const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
 
-  const updateConfig = (newConfig: Partial<GlobalConfig>) => {
-    setConfig(prev => ({ ...prev, ...newConfig }));
+  // Load user settings when user changes
+  useEffect(() => {
+    if (!user) {
+      setConfig(defaultConfig);
+      return;
+    }
+
+    const loadUserSettings = async () => {
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading user settings:', error);
+        return;
+      }
+
+      if (data) {
+        setConfig({
+          measurement: data.measurement,
+          currency: data.currency,
+          language: data.language,
+          showTooltips: data.show_tooltips
+        });
+      } else {
+        // Create default settings for new user
+        const { error: insertError } = await supabase
+          .from('user_settings')
+          .insert({
+            user_id: user.id,
+            ...defaultConfig
+          });
+
+        if (insertError) {
+          console.error('Error creating user settings:', insertError);
+        }
+      }
+    };
+
+    loadUserSettings();
+  }, [user]);
+
+  const updateConfig = async (newConfig: Partial<GlobalConfig>) => {
+    const updatedConfig = { ...config, ...newConfig };
+    setConfig(updatedConfig);
+
+    if (user) {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          measurement: updatedConfig.measurement,
+          currency: updatedConfig.currency,
+          language: updatedConfig.language,
+          show_tooltips: updatedConfig.showTooltips
+        });
+
+      if (error) {
+        console.error('Error updating user settings:', error);
+      }
+    }
   };
 
   const createNewShipment = () => {
@@ -82,12 +146,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentShipment(prev => {
       if (!prev) return null;
       
-      // Update the product
       const updatedProducts = prev.products.map(product => 
         product.id === id ? { ...product, ...productUpdates } : product
       );
       
-      // If containerId changed, update container products arrays
       if ('containerId' in productUpdates) {
         const updatedContainers = prev.containers.map(container => ({
           ...container,
@@ -116,7 +178,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentShipment(prev => {
       if (!prev) return null;
       
-      // Remove product from containers
       const updatedContainers = prev.containers.map(container => ({
         ...container,
         products: container.products.filter(pid => pid !== id)
@@ -169,7 +230,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentShipment(prev => {
       if (!prev) return null;
       
-      // Remove container and update products that were in it
       const updatedProducts = prev.products.map(product =>
         product.containerId === id ? { ...product, containerId: undefined } : product
       );
