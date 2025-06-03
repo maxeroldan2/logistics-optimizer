@@ -70,7 +70,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             measurement: data.measurement,
             currency: data.currency,
             language: data.language,
-            showTooltips: data.show_tooltips
+            showTooltips: data.show_tooltips // Changed from showTooltips to show_tooltips
           });
         } else {
           // Create default settings for new user
@@ -78,7 +78,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             .from('user_settings')
             .insert({
               user_id: user.id,
-              ...defaultConfig
+              measurement: defaultConfig.measurement,
+              currency: defaultConfig.currency,
+              language: defaultConfig.language,
+              show_tooltips: defaultConfig.showTooltips // Changed from showTooltips to show_tooltips
             });
 
           if (insertError) {
@@ -105,7 +108,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           measurement: updatedConfig.measurement,
           currency: updatedConfig.currency,
           language: updatedConfig.language,
-          show_tooltips: updatedConfig.showTooltips
+          show_tooltips: updatedConfig.showTooltips // Changed from showTooltips to show_tooltips
         });
 
       if (error) {
