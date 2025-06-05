@@ -7,7 +7,7 @@ import ProductForm from '../components/forms/ProductForm';
 import ProductList from '../components/products/ProductList';
 import ContainerForm from '../components/forms/ContainerForm';
 import ScoreCard from '../components/common/ScoreCard';
-import { calculateShipmentScore } from '../utils/calculations';
+import { calculateShipmentScore, calculateProductScore } from '../utils/calculations';
 import GlobalSettings from '../components/config/GlobalSettings';
 import { Settings, Plus } from 'lucide-react';
 import PremiumBanner from '../components/premium/PremiumBanner';
@@ -32,6 +32,7 @@ const Home: React.FC = () => {
   const [showNewContainerForm, setShowNewContainerForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [editingContainer, setEditingContainer] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   
   React.useEffect(() => {
     if (!currentShipment) {
@@ -63,6 +64,7 @@ const Home: React.FC = () => {
   
   const handleEditProduct = (productId: string) => {
     setEditingProduct(productId);
+    setSelectedProduct(productId);
   };
 
   const handleDuplicateProduct = (product: Product) => {
@@ -83,6 +85,9 @@ const Home: React.FC = () => {
     : undefined;
   
   const shipmentScore = calculateShipmentScore(currentShipment.products, currentShipment.containers);
+  const selectedProductScore = selectedProduct 
+    ? calculateProductScore(currentShipment.products.find(p => p.id === selectedProduct)!)
+    : null;
   
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -202,6 +207,25 @@ const Home: React.FC = () => {
                 description="The main optimization score based on profit per volume."
                 isPrimary={true}
               />
+
+              {selectedProductScore && (
+                <ScoreCard 
+                  score={{
+                    rawScore: selectedProductScore.rawScore,
+                    efficiencyScore: selectedProductScore.efficiencyScore,
+                    totalCost: currentShipment.products.find(p => p.id === selectedProduct)!.purchasePrice,
+                    totalResale: currentShipment.products.find(p => p.id === selectedProduct)!.resalePrice,
+                    profitMargin: (currentShipment.products.find(p => p.id === selectedProduct)!.resalePrice - 
+                                 currentShipment.products.find(p => p.id === selectedProduct)!.purchasePrice) / 
+                                 currentShipment.products.find(p => p.id === selectedProduct)!.purchasePrice,
+                    volumeUtilization: 1,
+                    weightUtilization: 1
+                  }}
+                  title="Product Score"
+                  description="Individual product optimization score."
+                  isPrimary={false}
+                />
+              )}
               
               {currentShipment.products.length > 0 ? (
                 <div className="bg-white rounded-lg shadow-md p-4">
