@@ -85,8 +85,13 @@ const Home: React.FC = () => {
     : undefined;
   
   const shipmentScore = calculateShipmentScore(currentShipment.products, currentShipment.containers);
-  const selectedProductScore = selectedProduct 
-    ? calculateProductScore(currentShipment.products.find(p => p.id === selectedProduct)!)
+  
+  const selectedProductData = selectedProduct 
+    ? currentShipment.products.find(p => p.id === selectedProduct)
+    : null;
+
+  const selectedProductScore = selectedProductData 
+    ? calculateProductScore(selectedProductData)
     : null;
   
   return (
@@ -208,21 +213,22 @@ const Home: React.FC = () => {
                 isPrimary={true}
               />
 
-              {selectedProductScore && (
+              {selectedProductScore && selectedProductData && (
                 <ScoreCard 
                   score={{
                     rawScore: selectedProductScore.rawScore,
                     efficiencyScore: selectedProductScore.efficiencyScore,
-                    totalCost: currentShipment.products.find(p => p.id === selectedProduct)!.purchasePrice,
-                    totalResale: currentShipment.products.find(p => p.id === selectedProduct)!.resalePrice,
-                    profitMargin: (currentShipment.products.find(p => p.id === selectedProduct)!.resalePrice - 
-                                 currentShipment.products.find(p => p.id === selectedProduct)!.purchasePrice) / 
-                                 currentShipment.products.find(p => p.id === selectedProduct)!.purchasePrice,
-                    volumeUtilization: 1,
-                    weightUtilization: 1
+                    totalCost: selectedProductData.purchasePrice * selectedProductData.quantity,
+                    totalResale: selectedProductData.resalePrice * selectedProductData.quantity,
+                    profitMargin: (selectedProductData.resalePrice - selectedProductData.purchasePrice) / 
+                                selectedProductData.purchasePrice,
+                    volumeUtilization: selectedProductScore.volume / 
+                      (Math.max(...currentShipment.products.map(p => calculateProductScore(p).volume))),
+                    weightUtilization: selectedProductData.weight / 
+                      Math.max(...currentShipment.products.map(p => p.weight))
                   }}
                   title="Product Score"
-                  description="Individual product optimization score."
+                  description="Individual product optimization score based on profit per volume and turnover time."
                   isPrimary={false}
                 />
               )}
