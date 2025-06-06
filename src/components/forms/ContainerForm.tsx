@@ -3,7 +3,17 @@ import { Edit2, Package, BookTemplate as Template } from 'lucide-react';
 import { Container } from '../../types';
 import Tooltip from '../common/Tooltip';
 import { useAppContext } from '../../context/AppContext';
-import { allContainerTemplates, getTemplateById } from '../../data/templates';
+import { 
+  allContainerTemplates, 
+  getTemplateById, 
+  getContainerCategories,
+  categoryDisplayNames,
+  getContainersByTransportType,
+  getContainersByCapacity,
+  getContainersByThermalProtection,
+  getPalletCompatibleContainers,
+  getComplianceContainers
+} from '../../data/templates';
 import IconSelector from '../common/IconSelector';
 
 interface ContainerFormProps {
@@ -22,6 +32,8 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
   const { config } = useAppContext();
   const [isEditMode, setIsEditMode] = useState(!container);
   const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
+  const [templateFilter, setTemplateFilter] = useState<string>('all');
+  
   const [formData, setFormData] = useState<Omit<Container, 'id' | 'products'>>({
     name: container?.name || '',
     height: container?.height || 100,
@@ -74,10 +86,39 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
       maxWeight: template.maxWeight,
       shippingCost: template.defaultShippingCost || 0,
       shippingDuration: template.defaultShippingDuration,
-      icon: formData.icon // Keep the current icon selection
+      icon: template.icon || 'Container'
     });
     
     setTemplateSelectOpen(false);
+  };
+
+  const getFilteredTemplates = () => {
+    switch (templateFilter) {
+      case 'maritime':
+        return getContainersByTransportType('maritime');
+      case 'air':
+        return getContainersByTransportType('air');
+      case 'land':
+        return getContainersByTransportType('land');
+      case 'small':
+        return getContainersByCapacity('small');
+      case 'medium':
+        return getContainersByCapacity('medium');
+      case 'large':
+        return getContainersByCapacity('large');
+      case 'extra-large':
+        return getContainersByCapacity('extra-large');
+      case 'thermal':
+        return getContainersByThermalProtection(true);
+      case 'pallet':
+        return getPalletCompatibleContainers();
+      case 'iata':
+        return getComplianceContainers('IATA');
+      case 'imo':
+        return getComplianceContainers('IMO');
+      default:
+        return allContainerTemplates;
+    }
   };
   
   const getUnitLabel = (type: 'dimension' | 'weight') => {
@@ -156,30 +197,69 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
       </div>
       
       {templateSelectOpen && (
-        <div className="mb-4 p-3 border rounded-md bg-gray-50">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Select Template</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {['maritime', 'international', 'personal', 'air'].map(category => (
-              <React.Fragment key={category}>
-                <div className="col-span-2 mb-1">
-                  <p className="text-xs text-gray-500 uppercase">
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </p>
+        <div className="mb-4 p-3 border rounded-md bg-gray-50 max-h-80 overflow-y-auto">
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="text-sm font-medium text-gray-700">Select Container Template</h4>
+            <select
+              value={templateFilter}
+              onChange={(e) => setTemplateFilter(e.target.value)}
+              className="text-xs px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Templates</option>
+              <optgroup label="🚢 Transport Type">
+                <option value="maritime">Maritime</option>
+                <option value="air">Air</option>
+                <option value="land">Land</option>
+              </optgroup>
+              <optgroup label="📏 Capacity">
+                <option value="small">Small (&lt;0.05 m³)</option>
+                <option value="medium">Medium (0.05-0.5 m³)</option>
+                <option value="large">Large (0.5-5 m³)</option>
+                <option value="extra-large">Extra Large (&gt;5 m³)</option>
+              </optgroup>
+              <optgroup label="🌡️ Special Features">
+                <option value="thermal">Thermal Protection</option>
+                <option value="pallet">Pallet Compatible</option>
+              </optgroup>
+              <optgroup label="📋 Compliance">
+                <option value="iata">IATA Compliant</option>
+                <option value="imo">IMO Compliant</option>
+              </optgroup>
+            </select>
+          </div>
+          
+          <div className="space-y-3">
+            {getContainerCategories().map(category => {
+              const filteredTemplates = getFilteredTemplates().filter(t => t.category === category);
+              if (filteredTemplates.length === 0) return null;
+              
+              return (
+                <div key={category}>
+                  <div className="mb-2">
+                    <p className="text-xs text-gray-600 font-medium">
+                      {categoryDisplayNames[category]}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-1 ml-2">
+                    {filteredTemplates.map(template => (
+                      <button
+                        key={template.id}
+                        onClick={() => applyTemplate(template.id)}
+                        className="text-left text-sm px-2 py-1 rounded hover:bg-blue-50 hover:text-blue-700 flex items-center justify-between"
+                      >
+                        <div className="flex items-center">
+                          <span className="text-xs mr-2">{template.icon}</span>
+                          <span>{template.name}</span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {template.maxWeight}kg • ${template.defaultShippingCost}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                {allContainerTemplates
-                  .filter(t => t.category === category)
-                  .map(template => (
-                    <button
-                      key={template.id}
-                      onClick={() => applyTemplate(template.id)}
-                      className="text-left text-sm px-2 py-1 rounded hover:bg-blue-50 hover:text-blue-700"
-                    >
-                      {template.name}
-                    </button>
-                  ))
-                }
-              </React.Fragment>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
