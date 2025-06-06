@@ -6,6 +6,7 @@ import { calculateContainerScore } from '../../utils/calculations';
 import ScoreCard from '../common/ScoreCard';
 import { Package, Edit2, Trash2 } from 'lucide-react';
 import ConfirmDialog from '../common/ConfirmDialog';
+import { getIconByName } from '../common/IconSelector';
 
 interface ContainerDropZoneProps {
   container: Container;
@@ -28,6 +29,7 @@ const ContainerDropZone: React.FC<ContainerDropZoneProps> = ({
   const { config } = useAppContext();
   const containerProducts = products.filter(p => p.containerId === container.id);
   const containerScore = calculateContainerScore(containerProducts, container);
+  const ContainerIcon = getIconByName(container.icon);
   
   return (
     <>
@@ -41,7 +43,10 @@ const ContainerDropZone: React.FC<ContainerDropZoneProps> = ({
       >
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{container.name}</h3>
+            <div className="flex items-center mb-2">
+              <ContainerIcon className="h-5 w-5 text-blue-600 mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900">{container.name}</h3>
+            </div>
             <div className="text-sm text-gray-500">
               {container.height} × {container.width} × {container.length} 
               {config.measurement === 'metric' ? ' cm' : ' in'}
@@ -71,22 +76,25 @@ const ContainerDropZone: React.FC<ContainerDropZoneProps> = ({
         </div>
         
         <div className="space-y-2">
-          {containerProducts.map(product => (
-            <div 
-              key={product.id}
-              className="p-2 bg-gray-50 rounded border border-gray-200"
-            >
-              <div className="flex items-center">
-                <Package className="h-4 w-4 text-gray-400 mr-2" />
-                <div>
-                  <div className="font-medium text-gray-700">{product.name}</div>
-                  <div className="text-sm text-gray-500">
-                    Qty: {product.quantity}
+          {containerProducts.map(product => {
+            const ProductIcon = getIconByName(product.icon);
+            return (
+              <div 
+                key={product.id}
+                className="p-2 bg-gray-50 rounded border border-gray-200"
+              >
+                <div className="flex items-center">
+                  <ProductIcon className="h-4 w-4 text-gray-400 mr-2" />
+                  <div>
+                    <div className="font-medium text-gray-700">{product.name}</div>
+                    <div className="text-sm text-gray-500">
+                      Qty: {product.quantity}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           
           {containerProducts.length === 0 && (
             <div className="text-center py-8 text-gray-400">

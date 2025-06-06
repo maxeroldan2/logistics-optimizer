@@ -25,6 +25,7 @@ export interface Product {
   tag?: string;
   isBoxed: boolean;
   containerId?: string; // New field to track which container the product is in
+  icon?: string; // New field for product icon
 }
 
 export interface Container {
@@ -38,6 +39,7 @@ export interface Container {
   shippingDuration?: number;
   shippingCost: number;
   products: string[]; // Array of product IDs assigned to this container
+  icon?: string; // New field for container icon
 }
 
 export interface Shipment {

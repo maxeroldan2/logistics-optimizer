@@ -4,6 +4,7 @@ import { Container } from '../../types';
 import Tooltip from '../common/Tooltip';
 import { useAppContext } from '../../context/AppContext';
 import { allContainerTemplates, getTemplateById } from '../../data/templates';
+import IconSelector from '../common/IconSelector';
 
 interface ContainerFormProps {
   container?: Container;
@@ -28,7 +29,8 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
     length: container?.length || 100,
     maxWeight: container?.maxWeight || 100,
     shippingCost: container?.shippingCost || 0,
-    shippingDuration: container?.shippingDuration || undefined
+    shippingDuration: container?.shippingDuration || undefined,
+    icon: container?.icon || 'Container'
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +39,13 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
     setFormData(prev => ({
       ...prev,
       [name]: type === 'number' ? Number(value) : value
+    }));
+  };
+
+  const handleIconSelect = (iconName: string) => {
+    setFormData(prev => ({
+      ...prev,
+      icon: iconName
     }));
   };
   
@@ -64,7 +73,8 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
       length: template.length,
       maxWeight: template.maxWeight,
       shippingCost: template.defaultShippingCost || 0,
-      shippingDuration: template.defaultShippingDuration
+      shippingDuration: template.defaultShippingDuration,
+      icon: formData.icon // Keep the current icon selection
     });
     
     setTemplateSelectOpen(false);
@@ -188,6 +198,19 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
             placeholder="Enter container name"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
                      focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          />
+        </div>
+
+        <div className="col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Tooltip content="Choose an icon to represent this container">
+              Container Icon
+            </Tooltip>
+          </label>
+          <IconSelector
+            selectedIcon={formData.icon}
+            onIconSelect={handleIconSelect}
+            placeholder="Select container icon"
           />
         </div>
         

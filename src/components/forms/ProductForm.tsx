@@ -3,6 +3,7 @@ import { Plus, Tag, X } from 'lucide-react';
 import { Product } from '../../types';
 import Tooltip from '../common/Tooltip';
 import { useAppContext } from '../../context/AppContext';
+import IconSelector from '../common/IconSelector';
 
 interface ProductFormProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
@@ -31,7 +32,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     daysToSell: initialProduct?.daysToSell || 7,
     quantity: initialProduct?.quantity || 1,
     isBoxed: initialProduct?.isBoxed || false,
-    containerId: initialProduct?.containerId
+    containerId: initialProduct?.containerId,
+    icon: initialProduct?.icon || 'Package'
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +42,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setProduct(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
+    }));
+  };
+
+  const handleIconSelect = (iconName: string) => {
+    setProduct(prev => ({
+      ...prev,
+      icon: iconName
     }));
   };
   
@@ -65,7 +74,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         resalePrice: 0,
         daysToSell: 7,
         quantity: 1,
-        isBoxed: false
+        isBoxed: false,
+        icon: 'Package'
       });
       setIsFormOpen(false);
     }
@@ -122,6 +132,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
               placeholder="Enter product name"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
                        focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <Tooltip content="Choose an icon to represent this product">
+                Product Icon
+              </Tooltip>
+            </label>
+            <IconSelector
+              selectedIcon={product.icon}
+              onIconSelect={handleIconSelect}
+              placeholder="Select product icon"
             />
           </div>
           

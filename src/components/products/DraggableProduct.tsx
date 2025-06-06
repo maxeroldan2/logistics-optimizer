@@ -5,6 +5,7 @@ import { Product } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { formatCurrency } from '../../utils/calculations';
 import ConfirmDialog from '../common/ConfirmDialog';
+import { getIconByName } from '../common/IconSelector';
 
 interface DraggableProductProps {
   product: Product;
@@ -30,6 +31,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
   } : undefined;
 
   const container = currentShipment?.containers.find(c => c.id === product.containerId);
+  const ProductIcon = getIconByName(product.icon);
   
   return (
     <>
@@ -43,7 +45,7 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
         >
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <Package className="h-5 w-5 text-blue-600" />
+              <ProductIcon className="h-5 w-5 text-blue-600" />
             </div>
             <div className="flex-grow">
               <div className="font-medium text-gray-900">{product.name}</div>

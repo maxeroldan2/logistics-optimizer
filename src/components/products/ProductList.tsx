@@ -3,6 +3,7 @@ import { Package, Edit, Trash2, Box } from 'lucide-react';
 import { Product } from '../../types';
 import { calculateProductScore, formatCurrency } from '../../utils/calculations';
 import { useAppContext } from '../../context/AppContext';
+import { getIconByName } from '../common/IconSelector';
 
 interface ProductListProps {
   products: Product[];
@@ -49,18 +50,24 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRemove, onEdit })
               const score = calculateProductScore(product);
               const unit = config.measurement === 'metric' ? 'cm' : 'in';
               const weightUnit = config.measurement === 'metric' ? 'kg' : 'lb';
+              const ProductIcon = getIconByName(product.icon);
               
               return (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-md bg-blue-100 text-blue-600">
-                        {product.isBoxed ? <Box size={20} /> : <Package size={20} />}
+                        <ProductIcon size={20} />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{product.name}</div>
                         <div className="text-sm text-gray-500">
                           Qty: {product.quantity} • {product.daysToSell} days to sell
+                          {product.isBoxed && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                              Boxed
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
