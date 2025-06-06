@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Tag, X } from 'lucide-react';
+import { Plus, Tag, X, BookTemplate as Template } from 'lucide-react';
 import { Product } from '../../types';
 import Tooltip from '../common/Tooltip';
 import { useAppContext } from '../../context/AppContext';
 import IconSelector from '../common/IconSelector';
+import { 
+  allProductTemplates, 
+  getProductTemplateById, 
+  getProductCategories,
+  categoryDisplayNames 
+} from '../../data/productTemplates';
 
 interface ProductFormProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
@@ -20,6 +26,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const { config } = useAppContext();
   const [isFormOpen, setIsFormOpen] = useState(!initialProduct);
+  const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
   
   const [product, setProduct] = useState<Omit<Product, 'id'>>({
     name: initialProduct?.name || '',
@@ -50,6 +57,27 @@ const ProductForm: React.FC<ProductFormProps> = ({
       ...prev,
       icon: iconName
     }));
+  };
+
+  const applyTemplate = (templateId: string) => {
+    const template = getProductTemplateById(templateId);
+    if (!template) return;
+    
+    setProduct(prev => ({
+      ...prev,
+      name: template.name,
+      height: template.height,
+      width: template.width,
+      length: template.length,
+      weight: template.weight,
+      purchasePrice: template.estimatedPurchasePrice,
+      resalePrice: template.estimatedResalePrice,
+      daysToSell: template.estimatedDaysToSell,
+      isBoxed: template.isBoxed,
+      icon: template.icon
+    }));
+    
+    setTemplateSelectOpen(false);
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,13 +137,57 @@ const ProductForm: React.FC<ProductFormProps> = ({
         <h3 className="text-lg font-semibold text-gray-800">
           {initialProduct ? 'Edit Product' : 'Add New Product'}
         </h3>
-        <button 
-          onClick={() => initialProduct ? onClose?.() : setIsFormOpen(false)}
-          className="text-gray-400 hover:text-gray-600"
-        >
-          <X size={20} />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={() => setTemplateSelectOpen(!templateSelectOpen)}
+            className="flex items-center text-blue-600 hover:text-blue-700"
+          >
+            <Template className="h-4 w-4 mr-1" />
+            <span className="text-sm">Templates</span>
+          </button>
+          <button 
+            onClick={() => initialProduct ? onClose?.() : setIsFormOpen(false)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X size={20} />
+          </button>
+        </div>
       </div>
+
+      {templateSelectOpen && (
+        <div className="mb-4 p-3 border rounded-md bg-gray-50 max-h-64 overflow-y-auto">
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Select Product Template</h4>
+          <div className="space-y-3">
+            {getProductCategories().map(category => (
+              <div key={category}>
+                <div className="mb-2">
+                  <p className="text-xs text-gray-600 font-medium">
+                    {categoryDisplayNames[category]}
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 gap-1 ml-2">
+                  {allProductTemplates
+                    .filter(t => t.category === category)
+                    .map(template => (
+                      <button
+                        key={template.id}
+                        onClick={() => applyTemplate(template.id)}
+                        className="text-left text-sm px-2 py-1 rounded hover:bg-blue-50 hover:text-blue-700 flex items-center"
+                      >
+                        <span className="text-xs mr-2">{template.icon}</span>
+                        <span>{template.name}</span>
+                        <span className="ml-auto text-xs text-gray-500">
+                          ${template.estimatedPurchasePrice} → ${template.estimatedResalePrice}
+                        </span>
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
