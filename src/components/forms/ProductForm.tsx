@@ -16,16 +16,18 @@ interface ProductFormProps {
   onUpdateProduct?: (id: string, updates: Partial<Product>) => void;
   product?: Product;
   onClose?: () => void;
+  isOpen?: boolean; // Add this prop to control visibility
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ 
   onAddProduct, 
   onUpdateProduct,
   product: initialProduct,
-  onClose 
+  onClose,
+  isOpen = false // Default to false
 }) => {
   const { config } = useAppContext();
-  const [isFormOpen, setIsFormOpen] = useState(!initialProduct);
+  const [isFormOpen, setIsFormOpen] = useState(isOpen || !initialProduct);
   const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
   
   const [product, setProduct] = useState<Omit<Product, 'id'>>({
@@ -42,6 +44,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
     containerId: initialProduct?.containerId,
     icon: initialProduct?.icon || 'Package'
   });
+
+  // Update form visibility when isOpen prop changes
+  React.useEffect(() => {
+    if (isOpen !== undefined) {
+      setIsFormOpen(isOpen);
+    }
+  }, [isOpen]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -106,6 +115,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
         icon: 'Package'
       });
       setIsFormOpen(false);
+      onClose?.(); // Call onClose when adding a new product
+    }
+  };
+
+  const handleCancel = () => {
+    if (initialProduct) {
+      onClose?.();
+    } else {
+      setIsFormOpen(false);
+      onClose?.();
     }
   };
   
@@ -146,7 +165,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <span className="text-sm">Templates</span>
           </button>
           <button 
-            onClick={() => initialProduct ? onClose?.() : setIsFormOpen(false)}
+            onClick={handleCancel}
             className="text-gray-400 hover:text-gray-600"
           >
             <X size={20} />
@@ -417,7 +436,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         <div className="mt-6 flex justify-end">
           <button
             type="button"
-            onClick={() => initialProduct ? onClose?.() : setIsFormOpen(false)}
+            onClick={handleCancel}
             className="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 
                      shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white 
                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 

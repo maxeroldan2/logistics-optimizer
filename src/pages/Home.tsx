@@ -14,6 +14,7 @@ import PremiumBanner from '../components/premium/PremiumBanner';
 import PremiumFeatures from '../components/premium/PremiumFeatures';
 import ContainerDropZone from '../components/containers/ContainerDropZone';
 import DraggableProduct from '../components/products/DraggableProduct';
+import { Product } from '../types';
 
 const Home: React.FC = () => {
   const { 
@@ -242,6 +243,34 @@ const Home: React.FC = () => {
                   </div>
                 )}
 
+                {/* Container Form - Show when adding new container */}
+                {showNewContainerForm && (
+                  <div className="mb-6">
+                    <ContainerForm
+                      isOpen={true}
+                      onAddContainer={container => {
+                        addContainer(container);
+                        setShowNewContainerForm(false);
+                      }}
+                      onCancel={() => setShowNewContainerForm(false)}
+                    />
+                  </div>
+                )}
+
+                {/* Product Form - Show when adding new product */}
+                {showNewProductForm && (
+                  <div className="mb-6">
+                    <ProductForm
+                      isOpen={true}
+                      onAddProduct={product => {
+                        addProduct(product);
+                        setShowNewProductForm(false);
+                      }}
+                      onClose={() => setShowNewProductForm(false)}
+                    />
+                  </div>
+                )}
+
                 {/* Existing content when there are containers or products */}
                 {(hasContainers || hasProducts) && (
                   <div className="space-y-6">
@@ -271,24 +300,16 @@ const Home: React.FC = () => {
                         ))}
                       </div>
                       
-                      {(showNewContainerForm || containerBeingEdited) && (
+                      {containerBeingEdited && (
                         <div className="mt-4">
                           <ContainerForm
                             container={containerBeingEdited}
-                            onAddContainer={container => {
-                              addContainer(container);
-                              setShowNewContainerForm(false);
-                            }}
+                            isOpen={true}
                             onUpdateContainer={updates => {
-                              if (containerBeingEdited) {
-                                updateContainer(containerBeingEdited.id, updates);
-                                setEditingContainer(null);
-                              }
-                            }}
-                            onCancel={() => {
-                              setShowNewContainerForm(false);
+                              updateContainer(containerBeingEdited.id, updates);
                               setEditingContainer(null);
                             }}
+                            onCancel={() => setEditingContainer(null)}
                           />
                         </div>
                       )}
@@ -320,26 +341,17 @@ const Home: React.FC = () => {
                         ))}
                       </div>
                       
-                      {(showNewProductForm || editingProduct) && (
+                      {editingProduct && (
                         <div className="mt-4">
-                          {editingProduct ? (
-                            <ProductForm 
-                              product={productBeingEdited}
-                              onUpdateProduct={(id, updates) => {
-                                updateProduct(id, updates);
-                                setEditingProduct(null);
-                              }}
-                              onClose={() => setEditingProduct(null)}
-                            />
-                          ) : (
-                            <ProductForm 
-                              onAddProduct={product => {
-                                addProduct(product);
-                                setShowNewProductForm(false);
-                              }}
-                              onClose={() => setShowNewProductForm(false)}
-                            />
-                          )}
+                          <ProductForm 
+                            product={productBeingEdited}
+                            isOpen={true}
+                            onUpdateProduct={(id, updates) => {
+                              updateProduct(id, updates);
+                              setEditingProduct(null);
+                            }}
+                            onClose={() => setEditingProduct(null)}
+                          />
                         </div>
                       )}
                     </div>

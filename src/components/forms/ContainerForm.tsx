@@ -21,16 +21,18 @@ interface ContainerFormProps {
   onAddContainer?: (container: Omit<Container, 'id' | 'products'>) => void;
   onUpdateContainer?: (updates: Partial<Container>) => void;
   onCancel?: () => void;
+  isOpen?: boolean; // Add this prop to control visibility
 }
 
 const ContainerForm: React.FC<ContainerFormProps> = ({ 
   container,
   onAddContainer,
   onUpdateContainer,
-  onCancel
+  onCancel,
+  isOpen = false // Default to false
 }) => {
   const { config } = useAppContext();
-  const [isEditMode, setIsEditMode] = useState(!container);
+  const [isEditMode, setIsEditMode] = useState(isOpen || !container);
   const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
   const [templateFilter, setTemplateFilter] = useState<string>('all');
   
@@ -44,6 +46,13 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
     shippingDuration: container?.shippingDuration || undefined,
     icon: container?.icon || 'Container'
   });
+
+  // Update form visibility when isOpen prop changes
+  React.useEffect(() => {
+    if (isOpen !== undefined) {
+      setIsEditMode(isOpen);
+    }
+  }, [isOpen]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -71,6 +80,15 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
       setIsEditMode(false);
     } else if (onAddContainer) {
       onAddContainer(formData);
+      onCancel?.(); // Call onCancel when adding a new container
+    }
+  };
+
+  const handleCancel = () => {
+    if (container) {
+      setIsEditMode(false);
+    } else {
+      onCancel?.();
     }
   };
   
@@ -187,7 +205,7 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
           </button>
           {onCancel && (
             <button 
-              onClick={onCancel}
+              onClick={handleCancel}
               className="text-gray-500 hover:text-gray-700"
             >
               Cancel
@@ -405,7 +423,7 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
       <div className="mt-4 flex justify-end">
         {container && (
           <button
-            onClick={() => setIsEditMode(false)}
+            onClick={handleCancel}
             className="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 
                      shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white 
                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 
