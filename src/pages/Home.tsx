@@ -124,8 +124,36 @@ const Home: React.FC = () => {
                   </button>
                 </div>
                 
+                {/* Container Form - Show when adding new container */}
+                {showNewContainerForm && (
+                  <div className="mb-6">
+                    <ContainerForm
+                      isOpen={true}
+                      onAddContainer={container => {
+                        addContainer(container);
+                        setShowNewContainerForm(false);
+                      }}
+                      onCancel={() => setShowNewContainerForm(false)}
+                    />
+                  </div>
+                )}
+
+                {/* Product Form - Show when adding new product */}
+                {showNewProductForm && (
+                  <div className="mb-6">
+                    <ProductForm
+                      isOpen={true}
+                      onAddProduct={product => {
+                        addProduct(product);
+                        setShowNewProductForm(false);
+                      }}
+                      onClose={() => setShowNewProductForm(false)}
+                    />
+                  </div>
+                )}
+
                 {/* Starting State - No containers or products */}
-                {!hasContainers && !hasProducts && (
+                {!hasContainers && !hasProducts && !showNewContainerForm && !showNewProductForm && (
                   <div className="space-y-8">
                     <div className="text-center py-8">
                       <h3 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -240,34 +268,6 @@ const Home: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-
-                {/* Container Form - Show when adding new container */}
-                {showNewContainerForm && (
-                  <div className="mb-6">
-                    <ContainerForm
-                      isOpen={true}
-                      onAddContainer={container => {
-                        addContainer(container);
-                        setShowNewContainerForm(false);
-                      }}
-                      onCancel={() => setShowNewContainerForm(false)}
-                    />
-                  </div>
-                )}
-
-                {/* Product Form - Show when adding new product */}
-                {showNewProductForm && (
-                  <div className="mb-6">
-                    <ProductForm
-                      isOpen={true}
-                      onAddProduct={product => {
-                        addProduct(product);
-                        setShowNewProductForm(false);
-                      }}
-                      onClose={() => setShowNewProductForm(false)}
-                    />
                   </div>
                 )}
 
