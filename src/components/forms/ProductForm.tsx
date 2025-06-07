@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Tag, X, BookTemplate as Template, Brain } from 'lucide-react';
+import { Plus, Tag, X, BookTemplate as Template, Brain, Search } from 'lucide-react';
 import { Product } from '../../types';
 import Tooltip from '../common/Tooltip';
 import { useAppContext } from '../../context/AppContext';
@@ -28,7 +28,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const { config, aiDimensionsEnabled } = useAppContext();
   const [isFormOpen, setIsFormOpen] = useState(isOpen || !initialProduct);
-  const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
+  const [presetSelectOpen, setPresetSelectOpen] = useState(false);
+  const [presetSearchTerm, setPresetSearchTerm] = useState('');
   const [showTagInput, setShowTagInput] = useState(false);
   
   const [product, setProduct] = useState<Omit<Product, 'id'>>({
@@ -98,7 +99,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }));
   };
 
-  const applyTemplate = (templateId: string) => {
+  const applyPreset = (templateId: string) => {
     const template = getProductTemplateById(templateId);
     if (!template) return;
     
@@ -116,7 +117,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
       icon: template.icon
     }));
     
-    setTemplateSelectOpen(false);
+    setPresetSelectOpen(false);
+    setPresetSearchTerm('');
+  };
+
+  const getFilteredPresets = () => {
+    let presets = allProductTemplates;
+
+    // Apply search filter
+    if (presetSearchTerm.trim()) {
+      presets = presets.filter(preset => 
+        preset.name.toLowerCase().includes(presetSearchTerm.toLowerCase()) ||
+        preset.category.toLowerCase().includes(presetSearchTerm.toLowerCase())
+      );
+    }
+
+    return presets;
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -189,11 +205,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </h3>
         <div className="flex items-center space-x-2">
           <button 
-            onClick={() => setTemplateSelectOpen(!templateSelectOpen)}
+            onClick={() => setPresetSelectOpen(!presetSelectOpen)}
             className="flex items-center text-blue-600 hover:text-blue-700"
           >
             <Template className="h-4 w-4 mr-1" />
-            <span className="text-sm">Templates</span>
+            <span className="text-sm">Presets</span>
           </button>
           {aiDimensionsEnabled && (
             <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
@@ -210,37 +226,58 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </div>
       </div>
 
-      {templateSelectOpen && (
+      {presetSelectOpen && (
         <div className="mb-4 p-3 border rounded-md bg-gray-50 max-h-64 overflow-y-auto">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Select Product Template</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Select Product Preset</h4>
+          
+          {/* Search Input */}
+          <div className="relative mb-3">
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search presets..."
+              value={presetSearchTerm}
+              onChange={(e) => setPresetSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
           <div className="space-y-3">
-            {getProductCategories().map(category => (
-              <div key={category}>
-                <div className="mb-2">
-                  <p className="text-xs text-gray-600 font-medium">
-                    {categoryDisplayNames[category]}
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 gap-1 ml-2">
-                  {allProductTemplates
-                    .filter(t => t.category === category)
-                    .map(template => (
+            {getProductCategories().map(category => {
+              const filteredPresets = getFilteredPresets().filter(t => t.category === category);
+              if (filteredPresets.length === 0) return null;
+              
+              return (
+                <div key={category}>
+                  <div className="mb-2">
+                    <p className="text-xs text-gray-600 font-medium">
+                      {categoryDisplayNames[category]}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-1 ml-2">
+                    {filteredPresets.map(preset => (
                       <button
-                        key={template.id}
-                        onClick={() => applyTemplate(template.id)}
+                        key={preset.id}
+                        onClick={() => applyPreset(preset.id)}
                         className="text-left text-sm px-2 py-1 rounded hover:bg-blue-50 hover:text-blue-700 flex items-center"
                       >
-                        <span className="text-xs mr-2">{template.icon}</span>
-                        <span>{template.name}</span>
+                        <span className="text-xs mr-2">{preset.icon}</span>
+                        <span>{preset.name}</span>
                         <span className="ml-auto text-xs text-gray-500">
-                          ${template.estimatedPurchasePrice} → ${template.estimatedResalePrice}
+                          ${preset.estimatedPurchasePrice} → ${preset.estimatedResalePrice}
                         </span>
                       </button>
-                    ))
-                  }
+                    ))}
+                  </div>
                 </div>
+              );
+            })}
+
+            {getFilteredPresets().length === 0 && (
+              <div className="text-center py-4 text-gray-500 text-sm">
+                No presets found matching your search.
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
