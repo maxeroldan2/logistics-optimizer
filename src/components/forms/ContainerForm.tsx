@@ -255,10 +255,10 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
                 <option value="land">Land</option>
               </optgroup>
               <optgroup label="📏 Capacity">
-                <option value="small">Small (<0.05 m³)</option>
+                <option value="small">Small (&lt;0.05 m³)</option>
                 <option value="medium">Medium (0.05-0.5 m³)</option>
                 <option value="large">Large (0.5-5 m³)</option>
-                <option value="extra-large">Extra Large (>5 m³)</option>
+                <option value="extra-large">Extra Large (&gt;5 m³)</option>
               </optgroup>
               <optgroup label="🌡️ Special Features">
                 <option value="thermal">Thermal Protection</option>
