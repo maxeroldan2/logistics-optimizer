@@ -63,9 +63,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRemove, onEdit })
                         <div className="text-sm font-medium text-gray-900">{product.name}</div>
                         <div className="text-sm text-gray-500">
                           Qty: {product.quantity} • {product.daysToSell} days to sell
-                          {product.isBoxed && (
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                              Boxed
+                          {product.tag && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              {product.tag}
                             </span>
                           )}
                         </div>

@@ -29,6 +29,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const { config } = useAppContext();
   const [isFormOpen, setIsFormOpen] = useState(isOpen || !initialProduct);
   const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
+  const [showTagInput, setShowTagInput] = useState(false);
   
   const [product, setProduct] = useState<Omit<Product, 'id'>>({
     name: initialProduct?.name || '',
@@ -40,9 +41,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
     resalePrice: initialProduct?.resalePrice || 0,
     daysToSell: initialProduct?.daysToSell || 7,
     quantity: initialProduct?.quantity || 1,
-    isBoxed: initialProduct?.isBoxed || false,
+    isBoxed: false, // Always false now
     containerId: initialProduct?.containerId,
-    icon: initialProduct?.icon || 'Package'
+    icon: initialProduct?.icon || 'Package',
+    tag: initialProduct?.tag || ''
   });
 
   // Update form visibility when isOpen prop changes
@@ -53,11 +55,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }, [isOpen]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     
     setProduct(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
+      [name]: type === 'number' ? Number(value) : value
     }));
   };
 
@@ -82,7 +84,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       purchasePrice: template.estimatedPurchasePrice,
       resalePrice: template.estimatedResalePrice,
       daysToSell: template.estimatedDaysToSell,
-      isBoxed: template.isBoxed,
+      isBoxed: false, // Always false now
       icon: template.icon
     }));
     
@@ -112,7 +114,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         daysToSell: 7,
         quantity: 1,
         isBoxed: false,
-        icon: 'Package'
+        icon: 'Package',
+        tag: ''
       });
       setIsFormOpen(false);
       onClose?.(); // Call onClose when adding a new product
@@ -257,31 +260,52 @@ const ProductForm: React.FC<ProductFormProps> = ({
             />
           </div>
           
-          <div className="col-span-2 sm:col-span-1 flex items-center">
-            <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-              <input
-                type="checkbox"
-                name="isBoxed"
-                checked={product.isBoxed}
-                onChange={handleChange}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="ml-2">
-                <Tooltip content="Check if the product is already in its packaging box. If not, we'll calculate additional space for packaging.">
-                  Already in Box
-                </Tooltip>
-              </span>
-            </label>
-            
-            <div className="ml-4">
+          <div className="col-span-2 sm:col-span-1 flex items-center justify-between">
+            <div className="flex items-center">
               <Tooltip content="Add an optional tag to categorize this product">
-                <div className="flex items-center text-gray-600 hover:text-blue-500 cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setShowTagInput(!showTagInput)}
+                  className="flex items-center text-gray-600 hover:text-blue-500 cursor-pointer transition-colors"
+                >
                   <Tag size={16} />
-                  <span className="ml-1 text-sm">Add Tag</span>
-                </div>
+                  <span className="ml-1 text-sm">
+                    {product.tag ? `Tag: ${product.tag}` : 'Add Tag'}
+                  </span>
+                </button>
               </Tooltip>
             </div>
           </div>
+
+          {showTagInput && (
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Product Tag
+              </label>
+              <div className="mt-1 flex">
+                <input
+                  type="text"
+                  name="tag"
+                  value={product.tag}
+                  onChange={handleChange}
+                  placeholder="Enter a tag (e.g., electronics, clothing)"
+                  className="block w-full rounded-l-md border-gray-300 shadow-sm 
+                           focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTagInput(false);
+                    setProduct(prev => ({ ...prev, tag: '' }));
+                  }}
+                  className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 
+                           bg-gray-50 text-gray-500 rounded-r-md hover:bg-gray-100"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700">

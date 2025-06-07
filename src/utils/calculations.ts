@@ -3,9 +3,9 @@
 import { Container, Product, ProductScore, ShipmentScore, ContainerScore } from '../types';
 
 export const calculateProductVolume = (product: Product): number => {
-  const { height, width, length, isBoxed } = product;
-  const rawVolume = height * width * length;
-  return isBoxed ? rawVolume : rawVolume * 1.2;
+  const { height, width, length } = product;
+  // Removed isBoxed logic - now just returns raw volume
+  return height * width * length;
 };
 
 export const calculateProductProfit = (product: Product): number => {

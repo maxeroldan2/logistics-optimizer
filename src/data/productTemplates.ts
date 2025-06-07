@@ -27,7 +27,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 5,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'power-bank',
@@ -41,7 +41,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 30,
     estimatedDaysToSell: 7,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'phone-case',
@@ -69,7 +69,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 35,
     estimatedResalePrice: 70,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'led-lights',
@@ -83,7 +83,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 18,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'mini-speaker',
@@ -97,7 +97,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 6,
-    isBoxed: true
+    isBoxed: false
   },
   // New products from CSV
   {
@@ -112,7 +112,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 400,
     estimatedResalePrice: 800,
     estimatedDaysToSell: 3,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'screen-protector',
@@ -126,7 +126,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 2,
     estimatedResalePrice: 8,
     estimatedDaysToSell: 5,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'fast-charger',
@@ -140,7 +140,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 4,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'car-phone-mount',
@@ -154,7 +154,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'usb-memory',
@@ -168,7 +168,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 5,
     estimatedResalePrice: 15,
     estimatedDaysToSell: 6,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'microsd-card',
@@ -182,7 +182,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 7,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'laptop-notebook',
@@ -196,7 +196,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 300,
     estimatedResalePrice: 600,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'tablet-ipad',
@@ -210,7 +210,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 200,
     estimatedResalePrice: 400,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'smart-tv',
@@ -224,7 +224,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 250,
     estimatedResalePrice: 500,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'fire-tv-stick',
@@ -238,7 +238,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 40,
     estimatedDaysToSell: 5,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'playstation-5',
@@ -252,7 +252,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 400,
     estimatedResalePrice: 550,
     estimatedDaysToSell: 3,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'nintendo-switch',
@@ -266,7 +266,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 250,
     estimatedResalePrice: 350,
     estimatedDaysToSell: 5,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'xbox-series-x',
@@ -280,7 +280,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 350,
     estimatedResalePrice: 500,
     estimatedDaysToSell: 4,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'fitness-tracker',
@@ -294,7 +294,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 60,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'wifi-security-camera',
@@ -308,7 +308,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 30,
     estimatedResalePrice: 70,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'smart-doorbell',
@@ -322,7 +322,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 50,
     estimatedResalePrice: 120,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'voice-assistant',
@@ -336,7 +336,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 40,
     estimatedResalePrice: 80,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'gaming-headset',
@@ -350,7 +350,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 35,
     estimatedResalePrice: 80,
     estimatedDaysToSell: 7,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'gaming-controller',
@@ -364,7 +364,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 60,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'recreational-drone',
@@ -378,7 +378,7 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 80,
     estimatedResalePrice: 180,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   }
 ];
 
@@ -396,7 +396,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'hair-straightener',
@@ -410,7 +410,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'facial-serum',
@@ -424,7 +424,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'nail-kit',
@@ -438,7 +438,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 14,
-    isBoxed: true
+    isBoxed: false
   },
   // New products from CSV
   {
@@ -453,7 +453,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 5,
     estimatedResalePrice: 15,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'eyeshadow',
@@ -467,7 +467,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'vitamin-c-serum',
@@ -481,7 +481,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'moisturizing-cream',
@@ -495,7 +495,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'facial-sunscreen',
@@ -509,7 +509,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'face-mask',
@@ -523,7 +523,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 3,
     estimatedResalePrice: 8,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'special-shampoo',
@@ -537,7 +537,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'hair-dryer',
@@ -551,7 +551,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 60,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'hair-iron',
@@ -565,7 +565,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 50,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'electric-manicure-kit',
@@ -579,7 +579,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 18,
     estimatedResalePrice: 40,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'facial-roller',
@@ -593,7 +593,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'deodorant',
@@ -607,7 +607,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 4,
     estimatedResalePrice: 10,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'designer-perfume',
@@ -621,7 +621,7 @@ export const beautyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 30,
     estimatedResalePrice: 80,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   }
 ];
 
@@ -667,7 +667,7 @@ export const clothingProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 6,
     estimatedResalePrice: 18,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'casual-sneakers',
@@ -681,7 +681,7 @@ export const clothingProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 55,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'backpack',
@@ -766,7 +766,7 @@ export const clothingProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 40,
     estimatedResalePrice: 90,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'boots-casual-shoes',
@@ -780,7 +780,7 @@ export const clothingProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 30,
     estimatedResalePrice: 70,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'summer-dress',
@@ -864,7 +864,7 @@ export const clothingProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 50,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'fashion-cap',
@@ -910,7 +910,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'organizer-box',
@@ -938,7 +938,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'kitchen-utensils',
@@ -952,7 +952,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 22,
-    isBoxed: true
+    isBoxed: false
   },
   // New products from CSV
   {
@@ -967,7 +967,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 60,
     estimatedResalePrice: 120,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'capsule-coffee-maker',
@@ -981,7 +981,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 50,
     estimatedResalePrice: 100,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'blender-mixer',
@@ -995,7 +995,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 35,
     estimatedResalePrice: 80,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'electric-pressure-cooker',
@@ -1009,7 +1009,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 45,
     estimatedResalePrice: 90,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'kitchen-robot',
@@ -1023,7 +1023,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 80,
     estimatedResalePrice: 180,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'fridge-water-filter',
@@ -1037,7 +1037,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'fryer-spray',
@@ -1051,7 +1051,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 5,
     estimatedResalePrice: 12,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'silicone-baking-molds',
@@ -1065,7 +1065,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'non-stick-pan',
@@ -1079,7 +1079,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 22,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'kitchen-knives',
@@ -1093,7 +1093,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'dinnerware-set',
@@ -1107,7 +1107,7 @@ export const homeProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 60,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'coffee-table',
@@ -1195,7 +1195,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'baby-clothes',
@@ -1223,7 +1223,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 28,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   // New products from CSV
   {
@@ -1238,7 +1238,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 5,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'wet-wipes',
@@ -1252,7 +1252,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 3,
     estimatedResalePrice: 8,
     estimatedDaysToSell: 7,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'formula-milk',
@@ -1266,7 +1266,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 30,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'baby-food',
@@ -1280,7 +1280,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 2,
     estimatedResalePrice: 5,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'baby-monitor',
@@ -1294,7 +1294,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 40,
     estimatedResalePrice: 90,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'baby-thermometer',
@@ -1308,7 +1308,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'bottle-warmer',
@@ -1322,7 +1322,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'portable-crib',
@@ -1336,7 +1336,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 60,
     estimatedResalePrice: 130,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'baby-stroller',
@@ -1350,7 +1350,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 80,
     estimatedResalePrice: 180,
     estimatedDaysToSell: 35,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'dolls-barbie',
@@ -1364,7 +1364,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'action-figures',
@@ -1378,7 +1378,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'lego-sets',
@@ -1392,7 +1392,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 60,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'board-games',
@@ -1406,7 +1406,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'trading-cards',
@@ -1420,7 +1420,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 5,
     estimatedResalePrice: 15,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'video-games',
@@ -1434,7 +1434,7 @@ export const babyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 30,
     estimatedResalePrice: 60,
     estimatedDaysToSell: 7,
-    isBoxed: true
+    isBoxed: false
   }
 ];
 
@@ -1452,7 +1452,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 14,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'smart-water-bottle',
@@ -1466,7 +1466,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 18,
     estimatedResalePrice: 40,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'posture-corrector',
@@ -1480,7 +1480,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 30,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   },
   // New products from CSV
   {
@@ -1495,7 +1495,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'vitamin-d',
@@ -1509,7 +1509,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 6,
     estimatedResalePrice: 15,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'omega-3',
@@ -1523,7 +1523,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'hydrolyzed-collagen',
@@ -1537,7 +1537,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'glucometer',
@@ -1551,7 +1551,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 45,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'digital-blood-pressure',
@@ -1565,7 +1565,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 55,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'nebulizer',
@@ -1579,7 +1579,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 35,
     estimatedResalePrice: 80,
     estimatedDaysToSell: 35,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'infrared-thermometer',
@@ -1593,7 +1593,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 15,
     estimatedResalePrice: 35,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'electric-toothbrush',
@@ -1607,7 +1607,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 20,
     estimatedResalePrice: 50,
     estimatedDaysToSell: 22,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'antibacterial-wipes',
@@ -1621,7 +1621,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 3,
     estimatedResalePrice: 8,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'yoga-mat',
@@ -1649,7 +1649,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 30,
     estimatedDaysToSell: 20,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'lumbar-support',
@@ -1663,7 +1663,7 @@ export const fitnessProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   }
 ];
 
@@ -1681,7 +1681,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 16,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'automatic-feeder',
@@ -1695,7 +1695,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 35,
     estimatedResalePrice: 75,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'pet-bed',
@@ -1724,7 +1724,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 12,
     estimatedResalePrice: 25,
     estimatedDaysToSell: 10,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'cat-food',
@@ -1738,7 +1738,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 10,
     estimatedResalePrice: 22,
     estimatedDaysToSell: 8,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'pet-toys',
@@ -1752,7 +1752,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 5,
     estimatedResalePrice: 15,
     estimatedDaysToSell: 12,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'leash-harness',
@@ -1766,7 +1766,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 20,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'pet-clothing',
@@ -1794,7 +1794,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 8,
     estimatedResalePrice: 18,
     estimatedDaysToSell: 18,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'pet-brush',
@@ -1808,7 +1808,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 5,
     estimatedResalePrice: 15,
     estimatedDaysToSell: 15,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'automatic-water-fountain',
@@ -1822,7 +1822,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 25,
     estimatedResalePrice: 55,
     estimatedDaysToSell: 25,
-    isBoxed: true
+    isBoxed: false
   },
   {
     id: 'pet-gps',
@@ -1836,7 +1836,7 @@ export const petProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 30,
     estimatedResalePrice: 70,
     estimatedDaysToSell: 30,
-    isBoxed: true
+    isBoxed: false
   }
 ];
 
