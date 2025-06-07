@@ -49,6 +49,13 @@ export interface Shipment {
   containers: Container[]; // Changed from single container to array
   createdAt: Date;
   isPremium: boolean;
+  folderId?: string; // New field for folder organization
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
 
 export interface ProductScore {
@@ -75,11 +82,12 @@ export interface ShipmentScore {
 export interface ContainerTemplate {
   id: string;
   name: string;
-  category: 'maritime' | 'international' | 'personal' | 'air';
+  category: 'maritime' | 'international' | 'personal' | 'air' | 'logistics';
   height: number;
   width: number;
   length: number;
   maxWeight: number;
   defaultShippingCost?: number;
   defaultShippingDuration?: number;
+  icon?: string;
 }

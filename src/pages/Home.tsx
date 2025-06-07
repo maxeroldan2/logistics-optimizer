@@ -5,12 +5,160 @@ import ProductForm from '../components/forms/ProductForm';
 import ContainerForm from '../components/forms/ContainerForm';
 import { calculateShipmentScore, calculateProductScore, formatCurrency, formatPercentage } from '../utils/calculations';
 import GlobalSettings from '../components/config/GlobalSettings';
-import { Settings, Plus, Package, Container, Edit2, Trash2, Filter, TrendingUp, DollarSign, Clock, BarChart3, Save, Zap, Brain, Target, Star } from 'lucide-react';
+import { Settings, Plus, Package, Container, Edit2, Trash2, Filter, TrendingUp, DollarSign, Clock, BarChart3, Save, Zap, Brain, Target, Star, MoreVertical, Share, FolderPlus, Archive, Edit, Folder } from 'lucide-react';
 import ContainerDropZone from '../components/containers/ContainerDropZone';
 import DraggableProduct from '../components/products/DraggableProduct';
 import { Product } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../components/auth/AuthProvider';
+
+interface ShipmentMenuProps {
+  shipmentId: string;
+  shipmentName: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onRename: (id: string, newName: string) => void;
+  onMoveToFolder: (id: string, folderId: string) => void;
+  onArchive: (id: string) => void;
+  onDelete: (id: string) => void;
+  folders: Array<{ id: string; name: string }>;
+}
+
+const ShipmentMenu: React.FC<ShipmentMenuProps> = ({
+  shipmentId,
+  shipmentName,
+  isOpen,
+  onClose,
+  onRename,
+  onMoveToFolder,
+  onArchive,
+  onDelete,
+  folders
+}) => {
+  const [showRenameInput, setShowRenameInput] = useState(false);
+  const [showFolderSelect, setShowFolderSelect] = useState(false);
+  const [newName, setNewName] = useState(shipmentName);
+
+  if (!isOpen) return null;
+
+  const handleRename = () => {
+    if (newName.trim() && newName !== shipmentName) {
+      onRename(shipmentId, newName.trim());
+    }
+    setShowRenameInput(false);
+    onClose();
+  };
+
+  const handleMoveToFolder = (folderId: string) => {
+    onMoveToFolder(shipmentId, folderId);
+    setShowFolderSelect(false);
+    onClose();
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 z-40" 
+        onClick={onClose}
+      />
+      
+      {/* Menu */}
+      <div className="absolute right-0 top-8 z-50 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1">
+        {showRenameInput ? (
+          <div className="px-3 py-2">
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRename();
+                if (e.key === 'Escape') {
+                  setShowRenameInput(false);
+                  setNewName(shipmentName);
+                }
+              }}
+              onBlur={handleRename}
+              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoFocus
+            />
+          </div>
+        ) : showFolderSelect ? (
+          <div className="px-3 py-2">
+            <div className="text-xs font-medium text-gray-500 mb-2">Move to folder:</div>
+            <div className="space-y-1">
+              <button
+                onClick={() => handleMoveToFolder('')}
+                className="w-full text-left px-2 py-1 text-sm hover:bg-gray-100 rounded"
+              >
+                📁 No folder
+              </button>
+              {folders.map(folder => (
+                <button
+                  key={folder.id}
+                  onClick={() => handleMoveToFolder(folder.id)}
+                  className="w-full text-left px-2 py-1 text-sm hover:bg-gray-100 rounded"
+                >
+                  📁 {folder.name}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowFolderSelect(false)}
+              className="w-full text-left px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 rounded mt-2"
+            >
+              ← Back
+            </button>
+          </div>
+        ) : (
+          <>
+            <button
+              onClick={() => setShowRenameInput(true)}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+            >
+              <Edit className="h-4 w-4 mr-3" />
+              Cambiar el nombre
+            </button>
+            
+            <button
+              onClick={() => setShowFolderSelect(true)}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+            >
+              <Folder className="h-4 w-4 mr-3" />
+              Añadir al folder
+            </button>
+            
+            <button
+              onClick={() => {
+                onArchive(shipmentId);
+                onClose();
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+            >
+              <Archive className="h-4 w-4 mr-3" />
+              Archivar
+            </button>
+            
+            <hr className="my-1" />
+            
+            <button
+              onClick={() => {
+                if (confirm('¿Estás seguro de que quieres eliminar este envío?')) {
+                  onDelete(shipmentId);
+                  onClose();
+                }
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+            >
+              <Trash2 className="h-4 w-4 mr-3" />
+              Eliminar
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  );
+};
 
 const Home: React.FC = () => {
   const { user } = useAuth();
@@ -42,6 +190,22 @@ const Home: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [editingContainer, setEditingContainer] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  
+  // Mock folders data - in real app this would come from context/database
+  const [folders, setFolders] = useState([
+    { id: '1', name: 'Q1 2024' },
+    { id: '2', name: 'Electronics' },
+    { id: '3', name: 'Archived' }
+  ]);
+  
+  // Mock shipment folder assignments
+  const [shipmentFolders, setShipmentFolders] = useState<Record<string, string>>({
+    '1': '1', // Miami to Buenos Aires in Q1 2024
+    '2': '2', // China to Mexico in Electronics
+  });
   
   React.useEffect(() => {
     if (!currentShipment) {
@@ -68,6 +232,64 @@ const Home: React.FC = () => {
     if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} week${Math.floor(diffInDays / 7) > 1 ? 's' : ''} ago`;
     return `${Math.floor(diffInDays / 30)} month${Math.floor(diffInDays / 30) > 1 ? 's' : ''} ago`;
   };
+
+  const handleRenameShipment = (id: string, newName: string) => {
+    // In real app, this would update the shipment in context/database
+    console.log(`Renaming shipment ${id} to ${newName}`);
+  };
+
+  const handleMoveToFolder = (shipmentId: string, folderId: string) => {
+    setShipmentFolders(prev => ({
+      ...prev,
+      [shipmentId]: folderId
+    }));
+  };
+
+  const handleArchiveShipment = (id: string) => {
+    // Move to archived folder or mark as archived
+    const archivedFolder = folders.find(f => f.name === 'Archived');
+    if (archivedFolder) {
+      handleMoveToFolder(id, archivedFolder.id);
+    }
+  };
+
+  const handleDeleteShipment = (id: string) => {
+    // In real app, this would delete from context/database
+    console.log(`Deleting shipment ${id}`);
+  };
+
+  const createNewFolder = () => {
+    if (newFolderName.trim()) {
+      const newFolder = {
+        id: Date.now().toString(),
+        name: newFolderName.trim()
+      };
+      setFolders(prev => [...prev, newFolder]);
+      setNewFolderName('');
+      setShowNewFolderInput(false);
+    }
+  };
+
+  // Group shipments by folder
+  const groupedShipments = React.useMemo(() => {
+    const groups: Record<string, typeof savedShipments> = {
+      '': [] // No folder
+    };
+    
+    folders.forEach(folder => {
+      groups[folder.id] = [];
+    });
+
+    savedShipments.forEach(shipment => {
+      const folderId = shipmentFolders[shipment.id] || '';
+      if (!groups[folderId]) {
+        groups[folderId] = [];
+      }
+      groups[folderId].push(shipment);
+    });
+
+    return groups;
+  }, [savedShipments, shipmentFolders, folders]);
   
   if (!currentShipment) {
     return (
@@ -175,34 +397,156 @@ const Home: React.FC = () => {
         </div>
 
         {/* Saved Shipments */}
-        <div className="flex-1 p-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-3">SAVED SHIPMENTS</h3>
-          <div className="space-y-2">
-            {savedShipments.map((shipment, index) => (
-              <div 
-                key={shipment.id}
-                onClick={() => loadShipment(shipment)}
-                className={`p-3 rounded-md cursor-pointer transition-colors ${
-                  currentShipment?.id === shipment.id 
-                    ? 'bg-blue-50 border border-blue-200' 
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{shipment.name}</p>
-                    <p className={`text-xs ${
-                      index === 0 ? 'text-green-600' : 'text-gray-500'
-                    }`}>
-                      {index === 0 ? 'Active' : 'Draft'}
-                    </p>
+        <div className="flex-1 p-4 overflow-y-auto">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-900">SAVED SHIPMENTS</h3>
+            <button
+              onClick={() => setShowNewFolderInput(true)}
+              className="text-gray-400 hover:text-gray-600"
+              title="Create new folder"
+            >
+              <FolderPlus className="h-4 w-4" />
+            </button>
+          </div>
+
+          {showNewFolderInput && (
+            <div className="mb-3 p-2 bg-gray-50 rounded">
+              <input
+                type="text"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') createNewFolder();
+                  if (e.key === 'Escape') {
+                    setShowNewFolderInput(false);
+                    setNewFolderName('');
+                  }
+                }}
+                onBlur={createNewFolder}
+                placeholder="Folder name"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+              />
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {/* No folder group */}
+            {groupedShipments[''].length > 0 && (
+              <div className="space-y-2">
+                {groupedShipments[''].map((shipment, index) => (
+                  <div 
+                    key={shipment.id}
+                    className={`relative p-3 rounded-md cursor-pointer transition-colors ${
+                      currentShipment?.id === shipment.id 
+                        ? 'bg-blue-50 border border-blue-200' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div 
+                      className="flex items-center justify-between"
+                      onClick={() => loadShipment(shipment)}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{shipment.name}</p>
+                        <p className={`text-xs ${
+                          index === 0 ? 'text-green-600' : 'text-gray-500'
+                        }`}>
+                          {index === 0 ? 'Active' : 'Draft'}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-gray-500">
+                          {formatTimeAgo(shipment.createdAt)}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(openMenuId === shipment.id ? null : shipment.id);
+                          }}
+                          className="text-gray-400 hover:text-gray-600 p-1"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <ShipmentMenu
+                      shipmentId={shipment.id}
+                      shipmentName={shipment.name}
+                      isOpen={openMenuId === shipment.id}
+                      onClose={() => setOpenMenuId(null)}
+                      onRename={handleRenameShipment}
+                      onMoveToFolder={handleMoveToFolder}
+                      onArchive={handleArchiveShipment}
+                      onDelete={handleDeleteShipment}
+                      folders={folders}
+                    />
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {formatTimeAgo(shipment.createdAt)}
-                  </span>
-                </div>
+                ))}
               </div>
-            ))}
+            )}
+
+            {/* Folder groups */}
+            {folders.map(folder => {
+              const folderShipments = groupedShipments[folder.id] || [];
+              if (folderShipments.length === 0) return null;
+
+              return (
+                <div key={folder.id} className="space-y-2">
+                  <div className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <Folder className="h-3 w-3 mr-1" />
+                    {folder.name}
+                  </div>
+                  {folderShipments.map((shipment, index) => (
+                    <div 
+                      key={shipment.id}
+                      className={`relative ml-4 p-3 rounded-md cursor-pointer transition-colors ${
+                        currentShipment?.id === shipment.id 
+                          ? 'bg-blue-50 border border-blue-200' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <div 
+                        className="flex items-center justify-between"
+                        onClick={() => loadShipment(shipment)}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{shipment.name}</p>
+                          <p className="text-xs text-gray-500">Draft</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">
+                            {formatTimeAgo(shipment.createdAt)}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(openMenuId === shipment.id ? null : shipment.id);
+                            }}
+                            className="text-gray-400 hover:text-gray-600 p-1"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <ShipmentMenu
+                        shipmentId={shipment.id}
+                        shipmentName={shipment.name}
+                        isOpen={openMenuId === shipment.id}
+                        onClose={() => setOpenMenuId(null)}
+                        onRename={handleRenameShipment}
+                        onMoveToFolder={handleMoveToFolder}
+                        onArchive={handleArchiveShipment}
+                        onDelete={handleDeleteShipment}
+                        folders={folders}
+                      />
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         </div>
 
