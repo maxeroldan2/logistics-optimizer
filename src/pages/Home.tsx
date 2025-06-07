@@ -175,6 +175,7 @@ const Home: React.FC = () => {
     updateContainer,
     removeContainer,
     config,
+    updateConfig,
     // Premium features now available to all
     dumpingPenalizerEnabled,
     toggleDumpingPenalizer,
@@ -220,6 +221,14 @@ const Home: React.FC = () => {
   const handleSaveShipment = async () => {
     await saveCurrentShipment();
     // Show success message or toast
+  };
+
+  const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateConfig({ currency: e.target.value as any });
+  };
+
+  const handleMeasurementChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateConfig({ measurement: e.target.value as any });
   };
 
   const formatTimeAgo = (date: Date) => {
@@ -582,6 +591,7 @@ const Home: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <select 
                   value={config.currency}
+                  onChange={handleCurrencyChange}
                   className="text-sm border border-gray-300 rounded-md px-3 py-1"
                 >
                   <option value="USD">USD ($)</option>
@@ -590,12 +600,16 @@ const Home: React.FC = () => {
                 </select>
                 <select 
                   value={config.measurement}
+                  onChange={handleMeasurementChange}
                   className="text-sm border border-gray-300 rounded-md px-3 py-1"
                 >
                   <option value="metric">Metric</option>
                   <option value="imperial">Imperial</option>
                 </select>
-                <button className="text-gray-400 hover:text-gray-600">
+                <button 
+                  onClick={() => setShowSettings(true)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
                   <Settings className="h-5 w-5" />
                 </button>
                 <button 
