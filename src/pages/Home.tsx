@@ -550,57 +550,6 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Premium Tools */}
-        <div className="p-4 border-t border-gray-200">
-          <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-            <Star className="h-4 w-4 text-yellow-500 mr-1" />
-            Premium Tools
-          </h3>
-          <div className="space-y-2">
-            <button
-              onClick={toggleDumpingPenalizer}
-              className={`w-full text-left py-2 px-3 rounded text-sm transition-colors ${
-                dumpingPenalizerEnabled 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <div className="flex items-center">
-                <Target className="h-4 w-4 mr-2" />
-                Dumping Penalizer
-              </div>
-            </button>
-            
-            <button
-              onClick={toggleAiDimensions}
-              className={`w-full text-left py-2 px-3 rounded text-sm transition-colors ${
-                aiDimensionsEnabled 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <div className="flex items-center">
-                <Brain className="h-4 w-4 mr-2" />
-                AI Dimensions
-              </div>
-            </button>
-            
-            <button
-              onClick={toggleMarketAnalysis}
-              className={`w-full text-left py-2 px-3 rounded text-sm transition-colors ${
-                marketAnalysisEnabled 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <div className="flex items-center">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Market Analysis
-              </div>
-            </button>
-          </div>
-        </div>
-
         {/* Sign Out */}
         <div className="p-4 border-t border-gray-200">
           <button
