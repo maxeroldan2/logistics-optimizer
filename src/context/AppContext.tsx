@@ -9,7 +9,10 @@ interface AppContextType {
   config: GlobalConfig;
   updateConfig: (config: Partial<GlobalConfig>) => void;
   currentShipment: Shipment | null;
+  savedShipments: Shipment[];
   createNewShipment: () => void;
+  saveCurrentShipment: () => Promise<void>;
+  loadShipment: (shipment: Shipment) => void;
   updateShipmentName: (name: string) => void;
   addProduct: (product: Omit<Product, 'id'>) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
@@ -19,6 +22,13 @@ interface AppContextType {
   removeContainer: (id: string) => void;
   isPremiumUser: boolean;
   togglePremiumFeatures: () => void;
+  // Premium features now available to all users
+  dumpingPenalizerEnabled: boolean;
+  toggleDumpingPenalizer: () => void;
+  aiDimensionsEnabled: boolean;
+  toggleAiDimensions: () => void;
+  marketAnalysisEnabled: boolean;
+  toggleMarketAnalysis: () => void;
 }
 
 const defaultConfig: GlobalConfig = {
@@ -34,7 +44,7 @@ const defaultShipment: Shipment = {
   products: [],
   containers: [],
   createdAt: new Date(),
-  isPremium: false
+  isPremium: true // All shipments are now premium
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,7 +53,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const { user } = useAuth();
   const [config, setConfig] = useState<GlobalConfig>(defaultConfig);
   const [currentShipment, setCurrentShipment] = useState<Shipment | null>(null);
-  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
+  const [savedShipments, setSavedShipments] = useState<Shipment[]>([]);
+  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(true); // Always premium now
+  
+  // Premium features state - now available to all users
+  const [dumpingPenalizerEnabled, setDumpingPenalizerEnabled] = useState<boolean>(false);
+  const [aiDimensionsEnabled, setAiDimensionsEnabled] = useState<boolean>(false);
+  const [marketAnalysisEnabled, setMarketAnalysisEnabled] = useState<boolean>(false);
 
   // Load user settings when user changes
   useEffect(() => {
@@ -70,7 +86,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             measurement: data.measurement,
             currency: data.currency,
             language: data.language,
-            showTooltips: data.show_tooltips // Changed from showTooltips to show_tooltips
+            showTooltips: data.show_tooltips
           });
         } else {
           // Create default settings for new user
@@ -81,7 +97,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               measurement: defaultConfig.measurement,
               currency: defaultConfig.currency,
               language: defaultConfig.language,
-              show_tooltips: defaultConfig.showTooltips // Changed from showTooltips to show_tooltips
+              show_tooltips: defaultConfig.showTooltips
             });
 
           if (insertError) {
@@ -94,7 +110,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     loadUserSettings();
+    loadSavedShipments();
   }, [user]);
+
+  const loadSavedShipments = () => {
+    // Mock saved shipments for demo - in real app this would load from database
+    const mockShipments: Shipment[] = [
+      {
+        id: '1',
+        name: 'Miami to Buenos Aires',
+        products: [],
+        containers: [],
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        isPremium: true
+      },
+      {
+        id: '2',
+        name: 'China to Mexico',
+        products: [],
+        containers: [],
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        isPremium: true
+      },
+      {
+        id: '3',
+        name: 'Europe Electronics',
+        products: [],
+        containers: [],
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+        isPremium: true
+      }
+    ];
+    setSavedShipments(mockShipments);
+  };
 
   const updateConfig = async (newConfig: Partial<GlobalConfig>) => {
     const updatedConfig = { ...config, ...newConfig };
@@ -108,7 +156,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           measurement: updatedConfig.measurement,
           currency: updatedConfig.currency,
           language: updatedConfig.language,
-          show_tooltips: updatedConfig.showTooltips // Changed from showTooltips to show_tooltips
+          show_tooltips: updatedConfig.showTooltips
         });
 
       if (error) {
@@ -123,6 +171,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       id: uuidv4(),
       createdAt: new Date()
     });
+  };
+
+  const saveCurrentShipment = async () => {
+    if (!currentShipment) return;
+    
+    // In a real app, this would save to database
+    const existingIndex = savedShipments.findIndex(s => s.id === currentShipment.id);
+    if (existingIndex >= 0) {
+      // Update existing shipment
+      const updatedShipments = [...savedShipments];
+      updatedShipments[existingIndex] = currentShipment;
+      setSavedShipments(updatedShipments);
+    } else {
+      // Add new shipment
+      setSavedShipments(prev => [currentShipment, ...prev]);
+    }
+  };
+
+  const loadShipment = (shipment: Shipment) => {
+    setCurrentShipment(shipment);
   };
 
   const updateShipmentName = (name: string) => {
@@ -253,11 +321,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsPremiumUser(prev => !prev);
   };
 
+  const toggleDumpingPenalizer = () => {
+    setDumpingPenalizerEnabled(prev => !prev);
+  };
+
+  const toggleAiDimensions = () => {
+    setAiDimensionsEnabled(prev => !prev);
+  };
+
+  const toggleMarketAnalysis = () => {
+    setMarketAnalysisEnabled(prev => !prev);
+  };
+
   const contextValue: AppContextType = {
     config,
     updateConfig,
     currentShipment,
+    savedShipments,
     createNewShipment,
+    saveCurrentShipment,
+    loadShipment,
     updateShipmentName,
     addProduct,
     updateProduct,
@@ -266,7 +349,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateContainer,
     removeContainer,
     isPremiumUser,
-    togglePremiumFeatures
+    togglePremiumFeatures,
+    // Premium features now available to all
+    dumpingPenalizerEnabled,
+    toggleDumpingPenalizer,
+    aiDimensionsEnabled,
+    toggleAiDimensions,
+    marketAnalysisEnabled,
+    toggleMarketAnalysis
   };
 
   return (

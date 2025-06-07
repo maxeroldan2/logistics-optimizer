@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Tag, X, BookTemplate as Template } from 'lucide-react';
+import { Plus, Tag, X, BookTemplate as Template, Brain } from 'lucide-react';
 import { Product } from '../../types';
 import Tooltip from '../common/Tooltip';
 import { useAppContext } from '../../context/AppContext';
@@ -16,7 +16,7 @@ interface ProductFormProps {
   onUpdateProduct?: (id: string, updates: Partial<Product>) => void;
   product?: Product;
   onClose?: () => void;
-  isOpen?: boolean; // Add this prop to control visibility
+  isOpen?: boolean;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ 
@@ -24,9 +24,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onUpdateProduct,
   product: initialProduct,
   onClose,
-  isOpen = false // Default to false
+  isOpen = false
 }) => {
-  const { config } = useAppContext();
+  const { config, aiDimensionsEnabled } = useAppContext();
   const [isFormOpen, setIsFormOpen] = useState(isOpen || !initialProduct);
   const [templateSelectOpen, setTemplateSelectOpen] = useState(false);
   const [showTagInput, setShowTagInput] = useState(false);
@@ -53,6 +53,34 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setIsFormOpen(isOpen);
     }
   }, [isOpen]);
+
+  // AI Dimension autocompletion
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    setProduct(prev => ({ ...prev, name }));
+
+    // If AI dimensions is enabled, try to auto-fill dimensions
+    if (aiDimensionsEnabled && name.length > 3) {
+      const matchingTemplate = allProductTemplates.find(template => 
+        template.name.toLowerCase().includes(name.toLowerCase()) ||
+        name.toLowerCase().includes(template.name.toLowerCase().split(' ')[0])
+      );
+
+      if (matchingTemplate && product.height === 0) {
+        setProduct(prev => ({
+          ...prev,
+          height: matchingTemplate.height,
+          width: matchingTemplate.width,
+          length: matchingTemplate.length,
+          weight: matchingTemplate.weight,
+          purchasePrice: matchingTemplate.estimatedPurchasePrice,
+          resalePrice: matchingTemplate.estimatedResalePrice,
+          daysToSell: matchingTemplate.estimatedDaysToSell,
+          icon: matchingTemplate.icon
+        }));
+      }
+    }
+  };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -118,7 +146,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         tag: ''
       });
       setIsFormOpen(false);
-      onClose?.(); // Call onClose when adding a new product
+      onClose?.();
     }
   };
 
@@ -167,6 +195,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <Template className="h-4 w-4 mr-1" />
             <span className="text-sm">Templates</span>
           </button>
+          {aiDimensionsEnabled && (
+            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
+              <Brain className="h-3 w-3 mr-1" />
+              AI Active
+            </span>
+          )}
           <button 
             onClick={handleCancel}
             className="text-gray-400 hover:text-gray-600"
@@ -216,12 +250,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Product Name <span className="text-red-500">*</span>
+              {aiDimensionsEnabled && (
+                <span className="ml-2 text-xs text-purple-600">(AI will auto-complete dimensions)</span>
+              )}
             </label>
             <input
               type="text"
               name="name"
               value={product.name}
-              onChange={handleChange}
+              onChange={handleNameChange}
               required
               placeholder="Enter product name"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm 

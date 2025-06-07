@@ -3,8 +3,8 @@ import { Crown, Check, X } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 const PremiumBanner: React.FC = () => {
-  const { isPremiumUser, togglePremiumFeatures } = useAppContext();
-  const [isOpen, setIsOpen] = React.useState(true);
+  const { isPremiumUser } = useAppContext();
+  const [isOpen, setIsOpen] = React.useState(false); // Don't show banner since all users are premium now
   
   if (isPremiumUser || !isOpen) return null;
   
@@ -23,9 +23,9 @@ const PremiumBanner: React.FC = () => {
         </div>
         
         <div className="flex-grow text-center md:text-left">
-          <h3 className="text-lg font-semibold mb-1">Upgrade to Premium</h3>
+          <h3 className="text-lg font-semibold mb-1">Welcome to Premium!</h3>
           <p className="text-blue-100 text-sm mb-2">
-            Unlock advanced features to maximize your logistics profits
+            All premium features are now available to you at no cost
           </p>
           
           <div className="grid grid-cols-2 gap-2 text-xs mb-3">
@@ -43,18 +43,9 @@ const PremiumBanner: React.FC = () => {
             </div>
             <div className="flex items-center">
               <Check className="h-3 w-3 text-green-300 mr-1" />
-              <span>40+ Market Presets</span>
+              <span>Market Analysis</span>
             </div>
           </div>
-        </div>
-        
-        <div className="mt-3 md:mt-0 md:ml-4">
-          <button
-            onClick={togglePremiumFeatures}
-            className="px-4 py-2 bg-white text-blue-700 rounded-md font-medium text-sm hover:bg-blue-50 transition-colors"
-          >
-            Try Premium Demo
-          </button>
         </div>
       </div>
       

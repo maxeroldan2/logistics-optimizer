@@ -1,9 +1,9 @@
 import React from 'react';
-import { Package, Settings, Lock, DollarSign } from 'lucide-react';
+import { Package, Settings, DollarSign } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 const Header: React.FC = () => {
-  const { isPremiumUser, togglePremiumFeatures } = useAppContext();
+  const { isPremiumUser } = useAppContext();
   
   return (
     <header className="bg-white shadow-sm">
@@ -17,25 +17,10 @@ const Header: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={togglePremiumFeatures}
-              className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium
-                       ${isPremiumUser 
-                         ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white hover:from-yellow-500 hover:to-yellow-700' 
-                         : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              {isPremiumUser ? (
-                <>
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  Premium
-                </>
-              ) : (
-                <>
-                  <Lock className="h-4 w-4 mr-1" />
-                  Free
-                </>
-              )}
-            </button>
+            <div className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
+              <DollarSign className="h-4 w-4 mr-1" />
+              Premium
+            </div>
             
             <button 
               className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -55,5 +40,3 @@ const Header: React.FC = () => {
     </header>
   );
 };
-
-export default Header;
