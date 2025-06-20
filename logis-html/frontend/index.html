@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics Optimizer</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="authTitle">Login</h2>
+                <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="authForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" id="authSubmitBtn" class="btn btn-primary">Login</button>
+                </form>
+                <div class="auth-switch">
+                    <p id="authSwitchText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-top">
+                    <button onclick="showNewShipmentModal()" class="new-shipment-btn">
+                        <span class="icon">➕</span>
+                        New Shipment
+                    </button>
+                    
+                    <button onclick="showShipmentSearch()" class="search-btn">
+                        <span class="icon">🔍</span>
+                        Search Shipments
+                    </button>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3 class="sidebar-section-title">SAVED SHIPMENTS</h3>
+                    <div class="folder-icon">📁</div>
+                    
+                    <div class="folder-item">
+                        <div class="folder-header" onclick="toggleFolder('q1-2024')">
+                            <span class="folder-toggle">📁</span>
+                            <span class="folder-name">Q1 2024</span>
+                            <span class="folder-count">(0)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="folder-item">
+                        <div class="folder-header" onclick="toggleFolder('electronics')">
+                            <span class="folder-toggle">📁</span>
+                            <span class="folder-name">ELECTRONICS</span>
+                            <span class="folder-count">(0)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="folder-item">
+                        <div class="folder-header" onclick="toggleFolder('archived')">
+                            <span class="folder-toggle">📁</span>
+                            <span class="folder-name">ARCHIVED</span>
+                            <span class="folder-count">(0)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-section-title">SIN CARPETA</h3>
+                        <span class="folder-count">(3)</span>
+                        
+                        <div class="shipment-item active">
+                            <div class="shipment-name">qweqweqweqweq...</div>
+                            <div class="shipment-meta">
+                                <span class="shipment-status active">Active</span>
+                                <span class="shipment-date">Today</span>
+                                <button class="shipment-menu">⋮</button>
+                            </div>
+                        </div>
+                        
+                        <div class="shipment-item">
+                            <div class="shipment-name">dgd</div>
+                            <div class="shipment-meta">
+                                <span class="shipment-status draft">Draft</span>
+                                <span class="shipment-date">1 day ago</span>
+                                <button class="shipment-menu">⋮</button>
+                            </div>
+                        </div>
+                        
+                        <div class="shipment-item">
+                            <div class="shipment-name">akndmkasnmd...</div>
+                            <div class="shipment-meta">
+                                <span class="shipment-status draft">Draft</span>
+                                <span class="shipment-date">1 day ago</span>
+                                <button class="shipment-menu">⋮</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-bottom">
+                    <div class="user-profile">
+                        <div class="user-avatar">D</div>
+                        <div class="user-info">
+                            <div class="user-email" id="sidebarUserEmail">demo@example.com</div>
+                            <div class="user-plan">Premium Plan</div>
+                        </div>
+                        <button class="user-menu-btn">⋮</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboardView" class="view hidden">
+                <div class="dashboard-header">
+                    <h2>My Shipments</h2>
+                    <button onclick="showNewShipmentModal()" class="btn btn-primary">
+                        <span class="icon">➕</span>
+                        New Shipment
+                    </button>
+                </div>
+                
+                <div class="shipments-grid" id="shipmentsGrid">
+                    <!-- Shipments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Shipment Detail View -->
+            <div id="shipmentView" class="view">
+                <!-- Dashboard Content -->
+                <div class="dashboard-content">
+                    <!-- New Shipment Card -->
+                    <div class="new-shipment-card">
+                        <div class="new-shipment-content">
+                            <div class="new-shipment-header">
+                                <h2>New Shipment</h2>
+                                <button class="edit-btn">✏️</button>
+                            </div>
+                            <p class="new-shipment-subtitle">Ready to optimize.</p>
+                            <button class="save-btn">
+                                <span class="icon">💾</span>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Cards -->
+                    <div class="metrics-row">
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-content">
+                            <div class="metric-label">📊 SCORE</div>
+                            <div class="metric-value">--</div>
+                            <div class="metric-description">Awaiting data</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-content">
+                            <div class="metric-label">💰 PROFIT MARGIN</div>
+                            <div class="metric-value">--%</div>
+                            <div class="metric-description">$0.00 estimated</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-content">
+                            <div class="metric-label">⚡ EFFICIENCY</div>
+                            <div class="metric-value">--</div>
+                            <div class="metric-description">Based on turnover</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📦</div>
+                        <div class="metric-content">
+                            <div class="metric-label">📦 SPACE UTILIZED</div>
+                            <div class="metric-value">--%</div>
+                            <div class="metric-description">Container efficiency</div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Containers Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Containers</h3>
+                        <button onclick="showContainerForm()" class="add-btn">
+                            <span class="icon">➕</span>
+                            Add Container
+                        </button>
+                    </div>
+                    <div class="empty-containers">
+                        <div class="empty-container-icon">📦</div>
+                        <h4>No containers yet</h4>
+                        <p>Add your first container to start organizing your shipment</p>
+                        <button onclick="showContainerForm()" class="add-container-btn">
+                            <span class="icon">➕</span>
+                            Add Container
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Products Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Product Palette</h3>
+                        <button onclick="showProductForm()" class="add-btn">
+                            <span class="icon">➕</span>
+                            Add Product
+                        </button>
+                    </div>
+                    <div class="products-table-container">
+                        <table class="products-table" id="productsTable">
+                            <thead>
+                                <tr>
+                                    <th>PRODUCTO</th>
+                                    <th>QTY</th>
+                                    <th>PROFIT/UNIT</th>
+                                    <th>EFFICIENCY SCORE <span class="info-icon">ℹ️</span></th>
+                                    <th>ESTADO</th>
+                                    <th>ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <!-- Products will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div id="productModal" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Add New Product</h2>
+                <button class="close-btn" onclick="closeProductModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Product Name *</label>
+                            <input type="text" id="productName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productQuantity">Quantity</label>
+                            <input type="number" id="productQuantity" name="quantity" min="1" value="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Physical Attributes</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productHeight">Height (cm)</label>
+                                <input type="number" id="productHeight" name="height" step="0.1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="productWidth">Width (cm)</label>
+                                <input type="number" id="productWidth" name="width" step="0.1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="productLength">Length (cm)</label>
+                                <input type="number" id="productLength" name="length" step="0.1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="productWeight">Weight (kg)</label>
+                                <input type="number" id="productWeight" name="weight" step="0.1" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Financials</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="purchasePrice">Purchase Price (USD) *</label>
+                                <input type="number" id="purchasePrice" name="purchase_price" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="resalePrice">Resale Price (USD) *</label>
+                                <input type="number" id="resalePrice" name="resale_price" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="profit-display">
+                            <div class="profit-label">Potential Profit / unit</div>
+                            <div class="profit-value" id="profitValue">$0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Market Dynamics</h3>
+                        <div class="form-group">
+                            <label for="daysToSell">Days to Sell (Turnover)</label>
+                            <input type="number" id="daysToSell" name="days_to_sell" min="1" max="365" value="7">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="showProductLibrary()" class="btn btn-outline">
+                            📦 Load Preset
+                        </button>
+                        <div class="form-actions-right">
+                            <button type="button" onclick="closeProductModal()" class="btn btn-outline">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Form Modal -->
+    <div id="containerModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Container</h2>
+                <button class="close-btn" onclick="closeContainerModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="containerForm">
+                    <div class="form-group">
+                        <label for="containerName">Container Name *</label>
+                        <input type="text" id="containerName" name="name" required>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Dimensions</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="containerHeight">Height (cm)</label>
+                                <input type="number" id="containerHeight" name="height" step="0.1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="containerWidth">Width (cm)</label>
+                                <input type="number" id="containerWidth" name="width" step="0.1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="containerLength">Length (cm)</label>
+                                <input type="number" id="containerLength" name="length" step="0.1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="containerWeight">Weight Limit (kg)</label>
+                                <input type="number" id="containerWeight" name="weight_limit" step="0.1" min="0" required>
+                            </div>
+                        </div>
+                        <div class="volume-display">
+                            <div class="volume-label">Container Volume</div>
+                            <div class="volume-value" id="containerVolumeValue">0 cm³</div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="closeContainerModal()" class="btn btn-outline">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Container</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/calculations.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

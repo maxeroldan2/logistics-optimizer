@@ -1,0 +1,17 @@
+{
+  "headerSettingsWorking": false,
+  "mainSettingsFound": true,
+  "folderPlusFound": true,
+  "menuButtonsFound": 3,
+  "containerButtons": {
+    "editButtons": 0,
+    "deleteButtons": 0
+  },
+  "modalStatus": {
+    "settingsModalVisible": null,
+    "containerFormVisible": null,
+    "anyModalVisible": false
+  },
+  "errorsGenerated": 0,
+  "errors": []
+}

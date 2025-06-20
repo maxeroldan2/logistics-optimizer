@@ -1,0 +1,21 @@
+{
+  "productForm": {
+    "negativeWeightViaTyping": false,
+    "negativeWeightViaDOM": false,
+    "zeroWeightViaTyping": false,
+    "zeroWeightViaDOM": false,
+    "formAcceptsNegative": false,
+    "formAcceptsZero": false
+  },
+  "containerForm": {
+    "negativeMaxWeightViaTyping": false,
+    "negativeMaxWeightViaDOM": false,
+    "zeroMaxWeightViaTyping": false,
+    "zeroMaxWeightViaDOM": false,
+    "formAcceptsNegative": false,
+    "formAcceptsZero": false
+  },
+  "screenshots": [],
+  "details": [],
+  "error": "No element found for selector: input[name=\"name\"]"
+}

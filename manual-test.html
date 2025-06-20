@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weight Input Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        input { margin: 10px; padding: 5px; }
+        .result { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Weight Input Restrictions Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Input WITH min="0" (Restricted)</h2>
+        <label>Weight with min="0": </label>
+        <input type="number" id="restricted" min="0" step="0.1" placeholder="Try typing -5.5">
+        <button onclick="testInput('restricted')">Test Value</button>
+        <div id="restricted-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Input WITHOUT min attribute (Unrestricted)</h2>
+        <label>Weight without min: </label>
+        <input type="number" id="unrestricted" step="0.1" placeholder="Try typing -5.5">
+        <button onclick="testInput('unrestricted')">Test Value</button>
+        <div id="unrestricted-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Programmatic Value Setting</h2>
+        <button onclick="setProgrammaticValues()">Set -5.5 and 0 programmatically</button>
+        <div id="programmatic-result" class="result"></div>
+    </div>
+
+    <script>
+        function testInput(inputId) {
+            const input = document.getElementById(inputId);
+            const result = document.getElementById(inputId + '-result');
+            
+            result.innerHTML = `
+                <strong>Current value:</strong> "${input.value}"<br>
+                <strong>Length:</strong> ${input.value.length}<br>
+                <strong>Valid:</strong> ${input.validity.valid}<br>
+                <strong>Validity:</strong> ${JSON.stringify(input.validity)}<br>
+                <strong>Min attribute:</strong> "${input.min}"
+            `;
+        }
+        
+        function setProgrammaticValues() {
+            const restricted = document.getElementById('restricted');
+            const unrestricted = document.getElementById('unrestricted');
+            const result = document.getElementById('programmatic-result');
+            
+            // Set negative values
+            restricted.value = '-5.5';
+            unrestricted.value = '-5.5';
+            
+            result.innerHTML = `
+                <strong>After setting -5.5:</strong><br>
+                Restricted input: "${restricted.value}" (valid: ${restricted.validity.valid})<br>
+                Unrestricted input: "${unrestricted.value}" (valid: ${unrestricted.validity.valid})<br><br>
+            `;
+            
+            // Set zero values
+            restricted.value = '0';
+            unrestricted.value = '0';
+            
+            result.innerHTML += `
+                <strong>After setting 0:</strong><br>
+                Restricted input: "${restricted.value}" (valid: ${restricted.validity.valid})<br>
+                Unrestricted input: "${unrestricted.value}" (valid: ${unrestricted.validity.valid})
+            `;
+        }
+        
+        // Auto-test when page loads
+        window.onload = function() {
+            setTimeout(() => {
+                setProgrammaticValues();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

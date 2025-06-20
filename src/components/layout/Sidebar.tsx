@@ -654,36 +654,36 @@ const Sidebar: React.FC<SidebarProps> = ({
                 ) : (
                   // Normal mode
                   <div className="relative">
-                    <button
-                      onClick={() => toggleFolder(folder.id)}
-                      className="w-full flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700 transition-colors group"
-                    >
-                      <div className="flex items-center">
+                    <div className="w-full flex items-center justify-between text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700 transition-colors group">
+                      <button
+                        onClick={() => toggleFolder(folder.id)}
+                        className="flex items-center flex-1"
+                      >
                         <Folder className="h-3 w-3 mr-1" />
                         {folder.name}
                         <span className="ml-2 text-xs text-gray-400">
                           ({folderShipments.length})
                         </span>
-                      </div>
-                      <div className="flex items-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenFolderMenuId(openFolderMenuId === folder.id ? null : folder.id);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 mr-1 p-1 hover:bg-gray-200 rounded transition-opacity"
-                        >
-                          <MoreVertical className="h-3 w-3" />
-                        </button>
                         {folderShipments.length > 0 && (
-                          isExpanded ? (
-                            <ChevronDown className="h-3 w-3" />
-                          ) : (
-                            <ChevronRight className="h-3 w-3" />
-                          )
+                          <span className="ml-1">
+                            {isExpanded ? (
+                              <ChevronDown className="h-3 w-3" />
+                            ) : (
+                              <ChevronRight className="h-3 w-3" />
+                            )}
+                          </span>
                         )}
-                      </div>
-                    </button>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenFolderMenuId(openFolderMenuId === folder.id ? null : folder.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-opacity"
+                      >
+                        <MoreVertical className="h-3 w-3" />
+                      </button>
+                    </div>
 
                     <FolderMenu
                       folderId={folder.id}

@@ -1,0 +1,96 @@
+{
+  "testRunDate": "2025-06-08T17:52:59.913Z",
+  "summary": {
+    "totalTests": 12,
+    "passed": 8,
+    "failed": 4,
+    "totalConsoleErrors": 0
+  },
+  "testResults": [
+    {
+      "test": "Page Structure Analysis",
+      "status": "✅",
+      "details": "Found 12 buttons, 2 selects, 0 inputs",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:51.267Z"
+    },
+    {
+      "test": "Currency Dropdown (USD)",
+      "status": "✅",
+      "details": "Dropdown working with 3 options: USD ($), EUR (€), GBP (£)",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:51.860Z"
+    },
+    {
+      "test": "Measurement Dropdown (Metric)",
+      "status": "✅",
+      "details": "Dropdown working with 3 options: USD ($), EUR (€), GBP (£)",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:52.439Z"
+    },
+    {
+      "test": "Settings Button",
+      "status": "✅",
+      "details": "Element clicked successfully",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:53.511Z"
+    },
+    {
+      "test": "Folder Creation Button",
+      "status": "✅",
+      "details": "Element clicked successfully",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:54.525Z"
+    },
+    {
+      "test": "Shipment Menu Detection",
+      "status": "❌",
+      "details": "No menu buttons found",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:54.529Z"
+    },
+    {
+      "test": "Edit Buttons",
+      "status": "❌",
+      "details": "Found 0 edit buttons",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:54.531Z"
+    },
+    {
+      "test": "Delete Buttons",
+      "status": "❌",
+      "details": "Found 0 delete buttons",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:54.531Z"
+    },
+    {
+      "test": "Container Form Test",
+      "status": "❌",
+      "details": "Forms: 0, Modals: 0, Inputs: 8, Selects: 5",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:56.892Z"
+    },
+    {
+      "test": "Console Test: clicking New Shipment multiple times",
+      "status": "✅",
+      "details": "No errors",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:57.894Z"
+    },
+    {
+      "test": "Console Test: hovering over elements",
+      "status": "✅",
+      "details": "No errors",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:58.895Z"
+    },
+    {
+      "test": "Console Test: clicking save without data",
+      "status": "✅",
+      "details": "No errors",
+      "errors": [],
+      "timestamp": "2025-06-08T17:52:59.910Z"
+    }
+  ],
+  "consoleErrors": []
+}

@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "negativeWeightAccepted": false,
+  "zeroWeightAccepted": false,
+  "negativeMaxWeightAccepted": false,
+  "zeroMaxWeightAccepted": false,
+  "screenshots": [
+    "/Users/maxeroldan/Documents/logis/simple-test-initial.png",
+    "/Users/maxeroldan/Documents/logis/simple-test-after-click.png",
+    "/Users/maxeroldan/Documents/logis/simple-test-negative-weight.png",
+    "/Users/maxeroldan/Documents/logis/simple-test-zero-weight.png",
+    "/Users/maxeroldan/Documents/logis/simple-test-final.png"
+  ],
+  "errors": []
+}

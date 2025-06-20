@@ -59,6 +59,7 @@ const Home: React.FC = () => {
     handleDeleteFolder
   } = useFolderManagement();
   
+  // All hooks must be called before any early returns
   React.useEffect(() => {
     if (!currentShipment) {
       createNewShipment();
@@ -84,7 +85,30 @@ const Home: React.FC = () => {
   const handleToggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
+
+  const handleProductAssignment = React.useCallback((productId: string, containerId?: string) => {
+    updateProduct(productId, { containerId });
+  }, [updateProduct]);
+
+  const handleDuplicateProductWrapper = React.useCallback((product: Product) => {
+    const productWithoutId = handleDuplicateProduct(product);
+    addProduct(productWithoutId);
+  }, [handleDuplicateProduct, addProduct]);
   
+  const productBeingEdited = React.useMemo(() => 
+    editingProduct && currentShipment
+      ? currentShipment.products.find(p => p.id === editingProduct)
+      : undefined,
+    [editingProduct, currentShipment]
+  );
+
+  const containerBeingEdited = React.useMemo(() =>
+    editingContainer && currentShipment
+      ? currentShipment.containers.find(c => c.id === editingContainer)
+      : undefined,
+    [editingContainer, currentShipment]
+  );
+
   if (!currentShipment) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -95,23 +119,6 @@ const Home: React.FC = () => {
       </div>
     );
   }
-  
-  const handleProductAssignment = (productId: string, containerId?: string) => {
-    updateProduct(productId, { containerId });
-  };
-
-  const handleDuplicateProductWrapper = (product: Product) => {
-    const productWithoutId = handleDuplicateProduct(product);
-    addProduct(productWithoutId);
-  };
-  
-  const productBeingEdited = editingProduct 
-    ? currentShipment.products.find(p => p.id === editingProduct)
-    : undefined;
-
-  const containerBeingEdited = editingContainer
-    ? currentShipment.containers.find(c => c.id === editingContainer)
-    : undefined;
 
   return (
     <div className="flex h-screen bg-gray-50">
