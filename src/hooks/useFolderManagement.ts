@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../components/auth/AuthProvider';
+import { useAppContext } from '../context/AppContext';
 
 export const useFolderManagement = () => {
   const { user } = useAuth();
+  const { updateShipment, currentShipment } = useAppContext();
   const lastUserId = useRef<string | null>(null);
   
   // Initialize with default folders
@@ -77,6 +79,7 @@ export const useFolderManagement = () => {
   };
 
   const handleMoveToFolder = (shipmentId: string, folderId: string) => {
+    // Update the local shipment folders state for UI
     setShipmentFolders(prev => {
       const updated = { ...prev };
       if (folderId === '') {
@@ -88,6 +91,13 @@ export const useFolderManagement = () => {
       console.log(`Moving shipment ${shipmentId} to folder ${folderId || 'No folder'}`);
       return updated;
     });
+
+    // If this is the current shipment, update it in the context
+    if (currentShipment && currentShipment.id === shipmentId) {
+      const newFolderId = folderId === '' ? undefined : folderId;
+      console.log(`🔄 Updating current shipment folder to: ${newFolderId || 'No folder'}`);
+      updateShipment({ folderId: newFolderId });
+    }
   };
 
   const handleArchiveShipment = (id: string) => {

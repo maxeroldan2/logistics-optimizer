@@ -269,6 +269,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const shipments: Shipment[] = data.map(row => ({
           id: row.id,
           name: row.name,
+          folderId: row.folder_id,
           products: row.products || [],
           containers: row.containers || [],
           createdAt: new Date(row.created_at),
@@ -368,6 +369,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         id: currentShipment.id,
         user_id: user.id,
         name: currentShipment.name,
+        folder_id: currentShipment.folderId || null,
         products: currentShipment.products,
         containers: currentShipment.containers,
         config: config,
@@ -388,6 +390,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           .from('shipments')
           .update({
             name: shipmentData.name,
+            folder_id: shipmentData.folder_id,
             products: shipmentData.products,
             containers: shipmentData.containers,
             config: shipmentData.config,
