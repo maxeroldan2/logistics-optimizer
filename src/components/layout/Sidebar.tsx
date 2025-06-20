@@ -528,7 +528,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
 
     savedShipments.forEach(shipment => {
-      const folderId = shipmentFolders[shipment.id] || '';
+      // Use the folderId from the shipment object directly, fallback to shipmentFolders for local state
+      const folderId = shipment.folderId || shipmentFolders[shipment.id] || '';
       if (!groups[folderId]) {
         groups[folderId] = [];
       }

@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 
 export const useFolderManagement = () => {
   const { user } = useAuth();
-  const { updateShipment, currentShipment } = useAppContext();
+  const { updateShipment, currentShipment, savedShipments } = useAppContext();
   const lastUserId = useRef<string | null>(null);
   
   // Initialize with default folders
@@ -72,6 +72,24 @@ export const useFolderManagement = () => {
     console.log('💾 Saving shipment folders to localStorage:', shipmentFolders);
     localStorage.setItem(shipmentFoldersKey, JSON.stringify(shipmentFolders));
   }, [shipmentFolders, user]);
+
+  // Sync shipmentFolders with savedShipments that have folderId
+  useEffect(() => {
+    if (!user || !savedShipments) return;
+
+    setShipmentFolders(prev => {
+      const updated = { ...prev };
+      
+      // Add any shipments that have folderId but aren't in the local state
+      savedShipments.forEach(shipment => {
+        if (shipment.folderId && !updated[shipment.id]) {
+          updated[shipment.id] = shipment.folderId;
+        }
+      });
+
+      return updated;
+    });
+  }, [savedShipments, user]);
 
   const handleRenameShipment = (id: string, newName: string) => {
     // In real app, this would update the shipment in context/database
