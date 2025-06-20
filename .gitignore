@@ -22,4 +22,30 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables and secrets
 .env
+.env.local
+mcp-config.json
+
+# Test files and screenshots
+test-*.js
+test-*.cjs
+test-*.png
+test-*.json
+test-*.md
+test-*.html
+screenshot-*.png
+debug-*.png
+*-test-*.png
+verification-*.png
+simple-test-*.png
+auth-test-*.png
+edit-*-test.png
+focused-test-*.png
+detailed-*.png
+final-*.png
+fingerprint-*.json
+weight-test-*.json
+drag-drop-*.json
+manual-test-*.json

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../components/auth/AuthProvider';
 import { Package } from 'lucide-react';
 
 const Signup: React.FC = () => {
@@ -9,6 +9,7 @@ const Signup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,16 +17,7 @@ const Signup: React.FC = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) throw error;
-
+      await signUp(email, password);
       navigate('/');
     } catch (err: any) {
       setError(err.message);
@@ -52,6 +44,12 @@ const Signup: React.FC = () => {
             sign in to your account
           </button>
         </p>
+        {import.meta.env.DEV && (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') && (
+          <div className="mt-2 text-center text-xs text-gray-500 bg-yellow-50 p-2 rounded">
+            <p className="font-medium">Development Mode</p>
+            <p>Registration will work with any valid email and password (6+ chars)</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

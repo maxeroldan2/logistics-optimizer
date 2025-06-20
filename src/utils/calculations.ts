@@ -1,6 +1,7 @@
 // Utility functions for calculations
 
-import { Container, Product, ProductScore, ShipmentScore, ContainerScore } from '../types';
+import { Container, Product, ProductScore, ShipmentScore, ContainerScore, Shipment, DumpingCalculation } from '../types';
+import { calculateShipmentDumping, calculateMarketDemandModifier } from './dumpingCalculations';
 
 export const calculateProductVolume = (product: Product): number => {
   const { height, width, length } = product;
@@ -13,11 +14,30 @@ export const calculateProductProfit = (product: Product): number => {
   return (resalePrice - purchasePrice) * quantity;
 };
 
-export const calculateProductScore = (product: Product): ProductScore => {
+export const calculateProductScore = (
+  product: Product, 
+  dumpingCalculation?: DumpingCalculation
+): ProductScore => {
   const volume = calculateProductVolume(product) * product.quantity;
   const totalProfit = calculateProductProfit(product);
   const rawScore = totalProfit / volume;
   const efficiencyScore = rawScore / product.daysToSell;
+  
+  // Apply dumping calculations if available
+  if (dumpingCalculation) {
+    const adjustedProfit = dumpingCalculation.adjustedProfit * product.quantity;
+    const adjustedScore = adjustedProfit / volume;
+    
+    return {
+      volume,
+      totalProfit,
+      rawScore,
+      efficiencyScore,
+      adjustedProfit,
+      adjustedScore,
+      dumpingPenalty: dumpingCalculation.totalPenalty
+    };
+  }
   
   return {
     volume,
@@ -58,6 +78,14 @@ export const calculateShipmentScore = (
   products: Product[], 
   containers: Container[]
 ): ShipmentScore => {
+  return calculateShipmentScoreWithDumping(products, containers);
+};
+
+export const calculateShipmentScoreWithDumping = (
+  products: Product[], 
+  containers: Container[],
+  dumpingCalculations?: DumpingCalculation[]
+): ShipmentScore => {
   const totalProductsVolume = calculateTotalProductsVolume(products);
   const totalProductsWeight = calculateTotalProductsWeight(products);
   const totalContainerVolume = containers.reduce((total, container) => 
@@ -71,8 +99,11 @@ export const calculateShipmentScore = (
     return total + (product.purchasePrice * product.quantity);
   }, 0);
   
+  // Use dumping-adjusted prices if available, otherwise use regular prices
   const totalResale = products.reduce((total, product) => {
-    return total + (product.resalePrice * product.quantity);
+    const dumpingCalc = dumpingCalculations?.find(calc => calc.productId === product.id);
+    const effectivePrice = dumpingCalc ? dumpingCalc.adjustedPrice : product.resalePrice;
+    return total + (effectivePrice * product.quantity);
   }, 0);
   
   const totalShippingCost = containers.reduce((total, container) => 
@@ -119,4 +150,38 @@ export const formatPercentage = (value: number): string => {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1
   }).format(value);
+};
+
+/**
+ * Calculate complete shipment score including dumping penalties
+ */
+export const calculateCompleteShipmentScore = (
+  shipment: Shipment,
+  allShipments: Shipment[] = []
+): { 
+  score: ShipmentScore; 
+  dumpingCalculations: DumpingCalculation[];
+  productScores: ProductScore[];
+} => {
+  // Calculate dumping penalties
+  const dumpingCalculations = calculateShipmentDumping(shipment, allShipments);
+  
+  // Calculate shipment score with dumping applied
+  const score = calculateShipmentScoreWithDumping(
+    shipment.products, 
+    shipment.containers, 
+    dumpingCalculations
+  );
+  
+  // Calculate individual product scores with dumping
+  const productScores = shipment.products.map(product => {
+    const dumpingCalc = dumpingCalculations.find(calc => calc.productId === product.id);
+    return calculateProductScore(product, dumpingCalc);
+  });
+  
+  return {
+    score,
+    dumpingCalculations,
+    productScores
+  };
 };

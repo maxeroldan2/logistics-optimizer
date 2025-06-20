@@ -21,13 +21,14 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
   onDelete
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: product.id,
   });
   
   const { config, currentShipment } = useAppContext();
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    zIndex: isDragging ? 1000 : 'auto',
   } : undefined;
 
   const container = currentShipment?.containers.find(c => c.id === product.containerId);
@@ -41,7 +42,13 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
           style={style}
           {...attributes}
           {...listeners}
-          className="flex-grow p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow cursor-move bg-white"
+          className={`
+            flex-grow p-3 rounded-lg border transition-all duration-200 cursor-move bg-white
+            ${isDragging 
+              ? 'border-blue-500 shadow-lg opacity-75 rotate-2 scale-105' 
+              : 'border-gray-200 hover:border-blue-300 hover:shadow'
+            }
+          `}
         >
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">

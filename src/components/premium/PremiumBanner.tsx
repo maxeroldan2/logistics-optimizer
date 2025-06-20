@@ -1,10 +1,12 @@
 import React from 'react';
 import { Crown, Check, X } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
+import { useSubscription } from '../../hooks/useSubscription';
 
 const PremiumBanner: React.FC = () => {
-  const { isPremiumUser } = useAppContext();
-  const [isOpen, setIsOpen] = React.useState(false); // Don't show banner since all users are premium now
+  const { isPremiumUser, savedShipments } = useAppContext();
+  const { handleUpgrade } = useSubscription();
+  const [isOpen, setIsOpen] = React.useState(!isPremiumUser);
   
   if (isPremiumUser || !isOpen) return null;
   
@@ -23,15 +25,15 @@ const PremiumBanner: React.FC = () => {
         </div>
         
         <div className="flex-grow text-center md:text-left">
-          <h3 className="text-lg font-semibold mb-1">Welcome to Premium!</h3>
+          <h3 className="text-lg font-semibold mb-1">Upgrade to Premium</h3>
           <p className="text-blue-100 text-sm mb-2">
-            All premium features are now available to you at no cost
+            You're currently on the free plan. Upgrade to unlock all features!
           </p>
           
           <div className="grid grid-cols-2 gap-2 text-xs mb-3">
             <div className="flex items-center">
               <Check className="h-3 w-3 text-green-300 mr-1" />
-              <span>Save & Compare Shipments</span>
+              <span>Unlimited Shipments</span>
             </div>
             <div className="flex items-center">
               <Check className="h-3 w-3 text-green-300 mr-1" />
@@ -45,7 +47,22 @@ const PremiumBanner: React.FC = () => {
               <Check className="h-3 w-3 text-green-300 mr-1" />
               <span>Market Analysis</span>
             </div>
+            <div className="flex items-center">
+              <Check className="h-3 w-3 text-green-300 mr-1" />
+              <span>Export Data</span>
+            </div>
+            <div className="flex items-center">
+              <Check className="h-3 w-3 text-green-300 mr-1" />
+              <span>API Integrations</span>
+            </div>
           </div>
+          
+          <button
+            onClick={handleUpgrade}
+            className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded-lg text-sm transition-colors"
+          >
+            Upgrade Now
+          </button>
         </div>
       </div>
       

@@ -3,14 +3,19 @@ export interface ProductTemplate {
   name: string;
   category: string;
   icon: string;
-  height: number; // cm
-  width: number; // cm
-  length: number; // cm
-  weight: number; // kg
+  height: number; // cm (product only, without packaging)
+  width: number; // cm (product only, without packaging)
+  length: number; // cm (product only, without packaging)
+  weight: number; // kg (product only, without packaging)
   estimatedPurchasePrice: number; // USD
   estimatedResalePrice: number; // USD
   estimatedDaysToSell: number;
   isBoxed: boolean;
+  // Packaging information for original box calculations
+  packagedHeight?: number; // cm (with original packaging)
+  packagedWidth?: number; // cm (with original packaging)
+  packagedLength?: number; // cm (with original packaging)
+  packagedWeight?: number; // kg (with original packaging)
 }
 
 // 🔌 Tecnología y Electrónica
@@ -112,7 +117,11 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 400,
     estimatedResalePrice: 800,
     estimatedDaysToSell: 3,
-    isBoxed: false
+    isBoxed: false,
+    packagedHeight: 19.0,
+    packagedWidth: 11.0,
+    packagedLength: 6.5,
+    packagedWeight: 0.45
   },
   {
     id: 'screen-protector',
@@ -196,7 +205,11 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 300,
     estimatedResalePrice: 600,
     estimatedDaysToSell: 10,
-    isBoxed: false
+    isBoxed: false,
+    packagedHeight: 8.0,
+    packagedWidth: 42.0,
+    packagedLength: 32.0,
+    packagedWeight: 2.8
   },
   {
     id: 'tablet-ipad',
@@ -210,7 +223,11 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 200,
     estimatedResalePrice: 400,
     estimatedDaysToSell: 8,
-    isBoxed: false
+    isBoxed: false,
+    packagedHeight: 29.0,
+    packagedWidth: 22.0,
+    packagedLength: 4.5,
+    packagedWeight: 0.8
   },
   {
     id: 'smart-tv',
@@ -252,7 +269,11 @@ export const technologyProducts: ProductTemplate[] = [
     estimatedPurchasePrice: 400,
     estimatedResalePrice: 550,
     estimatedDaysToSell: 3,
-    isBoxed: false
+    isBoxed: false,
+    packagedHeight: 16.0,
+    packagedWidth: 44.0,
+    packagedLength: 31.0,
+    packagedWeight: 5.2
   },
   {
     id: 'nintendo-switch',

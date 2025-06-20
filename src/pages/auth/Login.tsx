@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
-import { Package } from 'lucide-react';
+import { useAuth } from '../../components/auth/AuthProvider';
+// Removed Lucide React import to avoid ad blocker issues
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +9,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,13 +17,7 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
+      await signIn(email, password);
       navigate('/');
     } catch (err: any) {
       setError(err.message);
@@ -35,7 +30,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <Package className="h-12 w-12 text-blue-600" />
+          <div className="h-12 w-12 text-4xl flex items-center justify-center">📦</div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Sign in to your account
@@ -49,12 +44,18 @@ const Login: React.FC = () => {
             create a new account
           </button>
         </p>
+        {import.meta.env.DEV && (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') && (
+          <div className="mt-2 text-center text-xs text-gray-500 bg-yellow-50 p-2 rounded">
+            <p className="font-medium">Development Mode</p>
+            <p>Use: demo@example.com / demo123</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative\" role="alert">
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative" role="alert">
               <span className="block sm:inline">{error}</span>
             </div>
           )}
