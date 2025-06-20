@@ -7,17 +7,27 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase:start": "~/bin/supabase start",
+    "supabase:stop": "~/bin/supabase stop",
+    "supabase:reset": "~/bin/supabase db reset",
+    "supabase:studio": "~/bin/supabase studio",
+    "supabase:status": "~/bin/supabase status"
   },
   "dependencies": {
+    "@brightdata/mcp": "^2.1.0",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@modelcontextprotocol/server-github": "^2025.4.8",
+    "@modelcontextprotocol/server-postgres": "^0.6.2",
+    "@modelcontextprotocol/server-puppeteer": "^2025.5.12",
     "@supabase/supabase-js": "^2.39.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.20.0",
+    "task-master-ai": "^0.16.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -32,6 +42,7 @@
     "eslint-plugin-react-refresh": "^0.4.11",
     "globals": "^15.9.0",
     "postcss": "^8.4.35",
+    "puppeteer": "^24.10.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
