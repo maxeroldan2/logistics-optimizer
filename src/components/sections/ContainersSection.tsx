@@ -229,11 +229,11 @@ const ContainersSection: React.FC<ContainersSectionProps> = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Containers</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Containers</h2>
         <button
           onClick={() => setShowNewContainerForm(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Container
@@ -251,10 +251,10 @@ const ContainersSection: React.FC<ContainersSectionProps> = ({
       />
 
       {/* Main Containers (first 2) */}
-      <div className={`grid gap-6 ${
+      <div className={`grid gap-4 sm:gap-6 ${
         containers.length === 1 
           ? 'grid-cols-1' 
-          : 'grid-cols-2'
+          : 'grid-cols-1 lg:grid-cols-2'
       }`}>
         {containers.slice(0, 2).map(container => (
           <DroppableContainer

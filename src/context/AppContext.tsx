@@ -148,6 +148,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (data) {
         // Convert Supabase data to Shipment objects
+        // Note: isPremium will be updated when subscriptionTier changes
         const shipments: Shipment[] = data.map(row => ({
           id: row.id,
           name: row.name,
@@ -155,7 +156,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           products: row.products || [],
           containers: row.containers || [],
           createdAt: new Date(row.created_at),
-          isPremium: subscriptionTier === 'premium'
+          isPremium: false  // Will be updated in a separate effect
         }));
 
         setSavedShipments(shipments);
@@ -164,7 +165,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch (error) {
       console.error('❌ Failed to load shipments:', error);
     }
-  }, [user, subscriptionTier]);
+  }, [user]);  // Removed subscriptionTier dependency to break infinite loop
 
   // Load subscription data when user changes
   useEffect(() => {
@@ -300,7 +301,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadSubscriptionData();
     loadUserSettings();
     loadSavedShipments();
-  }, [user, loadSavedShipments]);
+  }, [user]);  // Removed loadSavedShipments dependency to break loop
+
+  // Update isPremium flag when subscription tier changes
+  useEffect(() => {
+    if (savedShipments.length > 0) {
+      const isPremium = subscriptionTier === 'premium';
+      const needsUpdate = savedShipments.some(shipment => shipment.isPremium !== isPremium);
+      
+      if (needsUpdate) {
+        const updatedShipments = savedShipments.map(shipment => ({
+          ...shipment,
+          isPremium
+        }));
+        setSavedShipments(updatedShipments);
+      }
+    }
+  }, [subscriptionTier, savedShipments]);  // Only update when actually needed
 
   // Initialize shipment - load most recent or create new for first-time users
 

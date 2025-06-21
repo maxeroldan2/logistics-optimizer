@@ -26,7 +26,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
                        import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
   const forceRealAuth = import.meta.env.VITE_FORCE_REAL_AUTH === 'true';
-  const useRealAuth = !isPlaceholder || forceRealAuth;
+  const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
+  const useRealAuth = (!isPlaceholder || forceRealAuth) && !forceLocalStorage;
 
   const signIn = async (email: string, password: string) => {
     if (!useRealAuth) {
@@ -203,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, [isPlaceholder]);
+  }, [useRealAuth]);
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>

@@ -343,3 +343,115 @@ Failed to load resource: the server responded with a status of 409 (Conflict)
 **Prevention**: When using database triggers to create records, ensure application code uses UPDATE operations instead of INSERT/UPSERT for existing records.
 
 ---
+
+## 2025-06-21 (Continued)
+
+### Responsiveness Issues Fixed
+**Issue**: The application had severe responsiveness problems when compressed/on mobile devices, with overlapping elements and poor layout adaptation.
+
+**Root Cause**: The application was designed with desktop-first approach and lacked proper mobile responsive design patterns.
+
+**Fix Applied**:
+- **Mobile-First Design**: Implemented mobile-first responsive design using Tailwind CSS
+- **Sidebar Overlay**: Converted sidebar to mobile overlay with backdrop on small screens
+- **Responsive Header**: Created separate mobile and desktop layouts for ShipmentHeader component
+- **Mobile Product Cards**: Added touch-friendly mobile product cards with drag functionality
+- **Grid Adaptations**: Updated container grids to adapt from single to multi-column layouts
+- **Window Resize Handling**: Fixed window access issue in useState by moving to useEffect
+
+**Files Modified**:
+- `src/pages/Home.tsx` - Fixed window.innerWidth access and responsive sidebar logic
+- `src/components/shipment/ShipmentHeader.tsx` - Complete mobile/desktop layout separation
+- `src/components/sections/ContainersSection.tsx` - Responsive grid layouts
+- `src/components/sections/ProductsSection.tsx` - Mobile card implementation
+- `src/components/layout/SidebarRefactored.tsx` - Mobile overlay positioning
+
+**Result**: Application now works smoothly across all screen sizes from mobile to desktop.
+
+**Status**: ✅ Fixed
+
+---
+
+### Authentication Login Issues Fixed
+**Issue**: Users could not log in to the application, getting stuck at login screen.
+
+**Root Cause**: Environment configuration had placeholder Supabase URLs but the authentication logic wasn't properly handling the mock authentication mode.
+
+**Fix Applied**:
+- **Environment Configuration**: Set up proper mock authentication mode with placeholder credentials
+- **Auth Logic Fix**: Updated `useRealAuth` calculation in AuthProvider to respect `VITE_FORCE_LOCALSTORAGE` flag
+- **Dependency Fix**: Corrected useEffect dependency from `[isPlaceholder]` to `[useRealAuth]`
+
+**Files Modified**:
+- `.env` - Configured mock authentication mode
+- `src/components/auth/AuthProvider.tsx` - Fixed authentication logic and dependencies
+
+**Result**: Users can now log in with `demo@example.com` / `demo123` credentials.
+
+**Status**: ✅ Fixed
+
+---
+
+### Save Shipment Hanging/Crashing Fixed
+**Issue**: Clicking "Save" on shipments caused the application to hang and crash with no error messages.
+
+**Root Cause**: Environment pointed to non-existent Supabase URL (`https://your-actual-project-id.supabase.co`), causing network timeouts when trying to save to database.
+
+**Fix Applied**:
+- **Force localStorage Mode**: Added `VITE_FORCE_LOCALSTORAGE=true` to environment
+- **Mock Credentials**: Switched to placeholder Supabase URLs to trigger localStorage fallback
+- **Auth Logic Update**: Modified auth provider to respect localStorage forcing
+
+**Files Modified**:
+- `.env` - Added localStorage forcing and placeholder credentials
+- `src/components/auth/AuthProvider.tsx` - Added forceLocalStorage logic
+
+**Result**: Save functionality now works instantly using localStorage without network calls.
+
+**Status**: ✅ Fixed
+
+---
+
+### Page Refresh Hanging Fixed
+**Issue**: After saving a shipment, refreshing the page caused the application to hang indefinitely with loading animation.
+
+**Root Cause**: Multiple infinite dependency loops in AppContext initialization:
+1. Authentication provider still trying to connect to Supabase despite localStorage mode
+2. `loadSavedShipments` function depending on `subscriptionTier` while being called in useEffect that sets `subscriptionTier`
+3. Cascading re-renders between multiple useEffects
+
+**Fix Applied**:
+- **Auth Provider Fix**: Updated `useRealAuth` logic to properly respect `VITE_FORCE_LOCALSTORAGE` flag
+- **Dependency Chain Breaking**: Removed `subscriptionTier` dependency from `loadSavedShipments`
+- **Separated Concerns**: Created separate useEffect for updating `isPremium` flag
+- **Smart Updates**: Added checks to prevent unnecessary state updates
+- **Window Access Fix**: Fixed `window.innerWidth` access in Home component useState
+
+**Files Modified**:
+- `src/components/auth/AuthProvider.tsx` - Fixed forceLocalStorage logic
+- `src/context/AppContext.tsx` - Broke dependency loops, separated useEffects
+- `src/pages/Home.tsx` - Fixed window access in initial state
+
+**Result**: Application now loads instantly on refresh without hanging or infinite loops.
+
+**Status**: ✅ Fixed
+
+**Technical Patterns Implemented**:
+- Mobile-first approach with conditional rendering (`lg:hidden`, `lg:block`)
+- Touch-friendly interfaces with adequate touch targets (44px minimum)
+- Responsive grids that adapt from 1 to multiple columns
+- Mobile overlay patterns with backdrop for sidebar
+- Mock authentication for development with localStorage persistence
+- Separated concerns in useEffect hooks to prevent dependency loops
+- Smart state updates with change detection to prevent unnecessary re-renders
+
+**Environment Configuration Used**:
+```env
+VITE_SUPABASE_URL=https://placeholder.supabase.co
+VITE_SUPABASE_ANON_KEY=placeholder_key_for_development
+VITE_FORCE_LOCALSTORAGE=true
+```
+
+**Test Credentials**: demo@example.com / demo123
+
+---

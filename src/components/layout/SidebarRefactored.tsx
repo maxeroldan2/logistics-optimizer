@@ -74,7 +74,7 @@ const SidebarRefactored: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div className="w-64 bg-white shadow-lg flex flex-col">
+      <div className="fixed lg:relative top-0 left-0 z-50 lg:z-auto w-80 lg:w-64 h-full bg-white shadow-lg flex flex-col">
         <SidebarHeader onToggleSidebar={onToggleSidebar} />
         
         <ActionButtons 

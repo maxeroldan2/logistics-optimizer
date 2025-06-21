@@ -203,6 +203,103 @@ const DraggableProductRow: React.FC<DraggableProductRowProps> = ({
   );
 };
 
+// Mobile Product Card Component
+const MobileProductCard: React.FC<{
+  product: Product;
+  config: GlobalConfig;
+  onEditProduct: (productId: string) => void;
+  onRemoveProduct: (id: string) => void;
+  onSaveProduct: (product: Product) => void;
+}> = ({ product, config, onEditProduct, onRemoveProduct, onSaveProduct }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    isDragging,
+  } = useDraggable({
+    id: product.id,
+  });
+
+  const score = calculateProductScore(product);
+
+  return (
+    <div 
+      ref={setNodeRef}
+      className={`bg-white rounded-lg border border-gray-200 p-4 ${
+        isDragging ? 'opacity-50' : ''
+      }`}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center min-w-0">
+          <div className="text-lg mr-2">{product.icon || '📦'}</div>
+          <div className="min-w-0">
+            <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
+            <p className="text-sm text-gray-500">Qty: {product.quantity}</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2 ml-3">
+          <button
+            onClick={() => onSaveProduct(product)}
+            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+            title="Save product"
+          >
+            <Heart className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onEditProduct(product.id)}
+            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+            title="Edit product"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onRemoveProduct(product.id)}
+            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+            title="Delete product"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span className="text-gray-500">Profit/Unit:</span>
+          <div className="font-medium text-green-600">
+            {formatCurrency(product.resalePrice - product.purchasePrice, config.currency)}
+          </div>
+        </div>
+        <div>
+          <span className="text-gray-500">Efficiency:</span>
+          <div className="font-medium">{score.toFixed(1)}</div>
+        </div>
+        <div className="col-span-2">
+          <span className="text-gray-500">Status:</span>
+          <div className={`inline-flex px-2 py-1 text-xs rounded-full ml-2 ${
+            product.containerId 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-gray-100 text-gray-800'
+          }`}>
+            {product.containerId ? 'Assigned' : 'Unassigned'}
+          </div>
+        </div>
+      </div>
+      
+      {/* Drag handle for mobile */}
+      <div className="flex justify-center mt-3 pt-3 border-t border-gray-100">
+        <div 
+          {...attributes}
+          {...listeners}
+          className="flex items-center px-3 py-2 bg-gray-50 rounded-lg cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical className="h-4 w-4 text-gray-400 mr-2" />
+          <span className="text-sm text-gray-600">Drag to assign</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProductsSection: React.FC<ProductsSectionProps> = ({
   products,
   config,
@@ -308,11 +405,11 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Product Palette</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Product Palette</h2>
         <button
           onClick={() => setShowNewProductForm(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Product
@@ -329,8 +426,8 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
         onClose={() => setShowNewProductForm(false)}
       />
 
-      {/* Products Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Products Table - Desktop */}
+      <div className="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
           <div className="grid grid-cols-12 gap-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">
             <div className="col-span-1"></div>
@@ -385,6 +482,37 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Products Cards - Mobile */}
+      <div className="lg:hidden space-y-3">
+        {sortedProducts.map(product => (
+          <MobileProductCard
+            key={product.id}
+            product={product}
+            config={config}
+            onEditProduct={onEditProduct}
+            onRemoveProduct={onRemoveProduct}
+            onSaveProduct={handleSaveProduct}
+          />
+        ))}
+        
+        {sortedProducts.length === 0 && !showNewProductForm && (
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="text-gray-400 mb-4">
+              <Plus className="h-12 w-12 mx-auto" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No products yet</h3>
+            <p className="text-gray-500 mb-4">Add your first product to start building your shipment</p>
+            <button
+              onClick={() => setShowNewProductForm(true)}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Edit Product Modal */}

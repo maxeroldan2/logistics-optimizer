@@ -33,7 +33,25 @@ const Home: React.FC = () => {
   } = useAppContext();
   
   const [showSettings, setShowSettings] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  // Hide sidebar by default on mobile, show on desktop
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  
+  // Handle window resize for responsive sidebar behavior
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarVisible(true); // Show sidebar on desktop
+      } else {
+        setSidebarVisible(false); // Hide sidebar on mobile/tablet
+      }
+    };
+
+    // Set initial state
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Use custom hooks for state management
   const {
@@ -122,28 +140,35 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
+      {/* Sidebar - Mobile overlay, desktop side panel */}
       {sidebarVisible && (
-        <SidebarRefactored
-          user={user}
-          subscriptionTier={subscriptionTier}
-          savedShipments={savedShipments}
-          currentShipment={currentShipment}
-          folders={folders}
-          shipmentFolders={shipmentFolders}
-          onCreateNewShipment={createNewShipment}
-          onLoadShipment={loadShipment}
-          onCreateFolder={createNewFolder}
-          onRenameFolder={handleRenameFolder}
-          onDeleteFolder={handleDeleteFolder}
-          onRenameShipment={handleRenameShipment}
-          onMoveToFolder={handleMoveToFolder}
-          onArchiveShipment={handleArchiveShipment}
-          onDeleteShipment={handleDeleteShipment}
-          onSignOut={handleSignOut}
-          onSettingsClick={() => setShowSettings(true)}
-          onToggleSidebar={handleToggleSidebar}
-        />
+        <>
+          {/* Mobile backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={handleToggleSidebar}
+          />
+          <SidebarRefactored
+            user={user}
+            subscriptionTier={subscriptionTier}
+            savedShipments={savedShipments}
+            currentShipment={currentShipment}
+            folders={folders}
+            shipmentFolders={shipmentFolders}
+            onCreateNewShipment={createNewShipment}
+            onLoadShipment={loadShipment}
+            onCreateFolder={createNewFolder}
+            onRenameFolder={handleRenameFolder}
+            onDeleteFolder={handleDeleteFolder}
+            onRenameShipment={handleRenameShipment}
+            onMoveToFolder={handleMoveToFolder}
+            onArchiveShipment={handleArchiveShipment}
+            onDeleteShipment={handleDeleteShipment}
+            onSignOut={handleSignOut}
+            onSettingsClick={() => setShowSettings(true)}
+            onToggleSidebar={handleToggleSidebar}
+          />
+        </>
       )}
 
       {/* Main Content */}
@@ -152,7 +177,7 @@ const Home: React.FC = () => {
         products={currentShipment.products}
         onProductAssignment={handleProductAssignment}
       >
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           {/* Content Area with Header Inside */}
           <div className="flex-1 overflow-auto">
             {/* Header - will scroll with content */}
@@ -173,7 +198,7 @@ const Home: React.FC = () => {
             />
             
             {/* Main Content */}
-            <div className="p-6 space-y-8">
+            <div className="p-3 sm:p-6 space-y-4 sm:space-y-8">
               {/* Containers Section */}
               <ContainersSection
                 containers={currentShipment.containers}
@@ -202,7 +227,6 @@ const Home: React.FC = () => {
                 onDuplicateProduct={handleDuplicateProductWrapper}
                 onCancelEdit={cancelEditing}
               />
-
 
               {/* Market Analysis Section */}
               {marketAnalysisEnabled && currentShipment.products.length > 0 && (
