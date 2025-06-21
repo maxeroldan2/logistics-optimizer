@@ -23,6 +23,7 @@
     "@modelcontextprotocol/server-postgres": "^0.6.2",
     "@modelcontextprotocol/server-puppeteer": "^2025.5.12",
     "@supabase/supabase-js": "^2.39.0",
+    "@vercel/speed-insights": "^1.2.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
