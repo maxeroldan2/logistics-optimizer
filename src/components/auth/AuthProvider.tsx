@@ -152,8 +152,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        // Validate that the user actually exists in the auth system
+        try {
+          const { data: { user: authUser }, error } = await supabase.auth.getUser();
+          if (error || !authUser) {
+            console.warn('⚠️  Invalid session detected, signing out...');
+            await supabase.auth.signOut();
+            setUser(null);
+          } else {
+            setUser(authUser);
+          }
+        } catch (error) {
+          console.error('Auth validation error:', error);
+          console.warn('⚠️  Session validation failed, signing out...');
+          await supabase.auth.signOut();
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     }).catch((error) => {
       console.error('Auth error:', error);
@@ -161,8 +180,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Validate new sign-ins
+        try {
+          const { data: { user: authUser }, error } = await supabase.auth.getUser();
+          if (error || !authUser) {
+            console.warn('⚠️  Invalid session after sign-in, signing out...');
+            await supabase.auth.signOut();
+            setUser(null);
+          } else {
+            setUser(authUser);
+          }
+        } catch (error) {
+          console.error('Auth validation error on sign-in:', error);
+          setUser(null);
+        }
+      } else {
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 

@@ -277,19 +277,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             showTooltips: data.show_tooltips
           });
         } else {
-          // Create default settings for new user
-          const { error: insertError } = await supabase
+          // Update existing settings with defaults (record already created by trigger)
+          const { error: updateError } = await supabase
             .from('user_settings')
-            .insert({
-              user_id: user.id,
+            .update({
               measurement: defaultConfig.measurement,
               currency: defaultConfig.currency,
               language: defaultConfig.language,
               show_tooltips: defaultConfig.showTooltips
-            });
+            })
+            .eq('user_id', user.id);
 
-          if (insertError) {
-            console.error('Error creating user settings:', insertError);
+          if (updateError) {
+            console.error('Error updating user settings:', updateError);
           }
         }
       } catch (error) {

@@ -59,13 +59,14 @@ export interface SavedContainer {
   height: number;
   width: number;
   length: number;
-  max_weight: number;
-  shipping_cost: number;
-  shipping_duration: number;
+  weight_limit: number; // Database uses weight_limit, not max_weight
+  max_weight?: number; // Keep for backward compatibility
+  shipping_cost?: number; // Optional since it might not exist in older schema
+  shipping_duration?: number; // Optional since it might not exist in older schema
   icon: string;
   tags?: string[];
   created_at: string;
-  updated_at: string;
+  updated_at?: string; // Optional since it might not exist in older schema
 }
 
 export interface Container {

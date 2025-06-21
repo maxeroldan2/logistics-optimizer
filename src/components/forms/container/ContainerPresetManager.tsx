@@ -5,10 +5,12 @@ import { useSavedContainers } from '../../../hooks/useSavedContainers';
 
 interface ContainerPresetManagerProps {
   onApplyPreset: (container: Omit<Container, 'id' | 'products'>) => void;
+  isFullPage?: boolean;
 }
 
 export const ContainerPresetManager: React.FC<ContainerPresetManagerProps> = ({
-  onApplyPreset
+  onApplyPreset,
+  isFullPage = false
 }) => {
   const { savedContainers, savedContainerToContainer } = useSavedContainers();
   const [showPresets, setShowPresets] = useState(false);
@@ -103,14 +105,18 @@ export const ContainerPresetManager: React.FC<ContainerPresetManagerProps> = ({
     };
     
     onApplyPreset(containerData);
-    setShowPresets(false);
+    if (!isFullPage) {
+      setShowPresets(false);
+    }
   };
 
   const applySavedContainer = (savedContainer: typeof savedContainers[0]) => {
     const containerData = savedContainerToContainer(savedContainer);
     onApplyPreset(containerData);
-    setShowPresets(false);
-    setPresetSearchTerm('');
+    if (!isFullPage) {
+      setShowPresets(false);
+      setPresetSearchTerm('');
+    }
   };
 
   const getFilteredPresets = () => {
@@ -130,6 +136,96 @@ export const ContainerPresetManager: React.FC<ContainerPresetManagerProps> = ({
       (saved.tags || []).some(tag => tag.toLowerCase().includes(presetSearchTerm.toLowerCase()))
     );
   };
+
+  // If full page mode, always show the presets content
+  if (isFullPage) {
+    return (
+      <div>
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search presets (e.g., 'Maritime', 'Luggage', '20ft')..."
+            value={presetSearchTerm}
+            onChange={(e) => setPresetSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+          />
+        </div>
+
+        {/* Saved Containers Section */}
+        {savedContainers.length > 0 && (
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+              <Heart className="h-5 w-5 mr-2 text-pink-500" />
+              Saved Containers
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {getFilteredSavedContainers().map(saved => (
+                <button
+                  key={saved.id}
+                  type="button"
+                  onClick={() => applySavedContainer(saved)}
+                  className="bg-pink-50 border border-pink-200 rounded-lg p-6 hover:shadow-lg hover:border-pink-300 transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center group-hover:bg-pink-200 transition-colors">
+                      <span className="text-xl">{saved.icon || '📦'}</span>
+                    </div>
+                    <Heart className="h-5 w-5 text-pink-500" />
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">{saved.name}</h5>
+                  <p className="text-sm text-gray-600 mb-1">
+                    {saved.height}×{saved.width}×{saved.length}cm
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Max: {saved.maxWeight}kg
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Built-in Presets */}
+        <div>
+          <h4 className="text-lg font-semibold text-gray-700 mb-4">Built-in Presets</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {getFilteredPresets().map(preset => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-blue-300 transition-all text-left group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <span className="text-xl">{preset.icon}</span>
+                  </div>
+                </div>
+                <h5 className="font-semibold text-gray-900 mb-2">{preset.name}</h5>
+                <p className="text-sm text-gray-600 mb-2">{preset.description}</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  {preset.height}×{preset.width}×{preset.length}cm
+                </p>
+                <p className="text-sm text-gray-600">
+                  Max: {preset.maxWeight}kg • ${preset.shippingCost}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {getFilteredPresets().length === 0 && getFilteredSavedContainers().length === 0 && (
+          <div className="text-center py-12">
+            <Package className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-xl font-medium text-gray-900 mb-2">No containers found</h3>
+            <p className="text-gray-500">Try adjusting your search terms</p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="border-b border-gray-200">

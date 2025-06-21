@@ -70,11 +70,8 @@ export const useSavedContainers = () => {
         height: container.height,
         width: container.width,
         length: container.length,
-        max_weight: container.maxWeight,
-        shipping_cost: container.shippingCost,
-        shipping_duration: container.shippingDuration || 30,
-        icon: container.icon || '📦',
-        tags: tags || []
+        weight_limit: container.maxWeight, // Use weight_limit to match database schema
+        icon: container.icon || '📦'
       };
 
       const { error } = await supabase
@@ -102,10 +99,10 @@ export const useSavedContainers = () => {
       height: savedContainer.height,
       width: savedContainer.width,
       length: savedContainer.length,
-      maxWeight: savedContainer.max_weight,
-      shippingCost: savedContainer.shipping_cost,
-      shippingDuration: savedContainer.shipping_duration,
-      icon: savedContainer.icon,
+      maxWeight: savedContainer.weight_limit || savedContainer.max_weight, // Handle both field names
+      shippingCost: savedContainer.shipping_cost || 0,
+      shippingDuration: savedContainer.shipping_duration || 30,
+      icon: savedContainer.icon || '📦',
       tag: savedContainer.tags?.[0] || undefined
     };
   };
