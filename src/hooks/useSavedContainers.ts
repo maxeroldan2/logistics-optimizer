@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { SavedContainer, Container } from '../types';
 import { useAuth } from '../components/auth/AuthProvider';
@@ -10,7 +10,7 @@ export const useSavedContainers = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch user's saved containers
-  const fetchSavedContainers = async () => {
+  const fetchSavedContainers = useCallback(async () => {
     if (!user) return;
     
     // Check if using placeholder credentials
@@ -41,7 +41,7 @@ export const useSavedContainers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   // Save a container as a preset
   const saveContainer = async (container: Container, description?: string, tags?: string[]) => {
@@ -173,7 +173,7 @@ export const useSavedContainers = () => {
   // Load saved containers when user changes
   useEffect(() => {
     fetchSavedContainers();
-  }, [user]);
+  }, [user, fetchSavedContainers]);
 
   return {
     savedContainers,

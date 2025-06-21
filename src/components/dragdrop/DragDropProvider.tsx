@@ -1,5 +1,5 @@
-import React, { createContext, useContext } from 'react';
-import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
+import React, { createContext, useContext, useMemo } from 'react';
+import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent, DragOverlay, useSensors, useSensor, PointerSensor, KeyboardSensor } from '@dnd-kit/core';
 import { Container, Product } from '../../types';
 
 interface DragDropContextType {
@@ -8,6 +8,7 @@ interface DragDropContextType {
 
 const DragDropContext = createContext<DragDropContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useDraggedProduct = () => {
   const context = useContext(DragDropContext);
   if (context === undefined) {
@@ -30,6 +31,16 @@ const DragDropProvider: React.FC<DragDropProviderProps> = ({
   onProductAssignment
 }) => {
   const [activeProductId, setActiveProductId] = React.useState<string | null>(null);
+
+  // Configure sensors with improved accessibility
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor)
+  );
 
   // Get the product being dragged for the overlay
   const draggedProduct = activeProductId ? products.find(p => p.id === activeProductId) : null;
@@ -99,13 +110,21 @@ const DragDropProvider: React.FC<DragDropProviderProps> = ({
     return 'bg-gray-500';
   };
 
+  const contextValue = useMemo(() => ({ 
+    draggedProduct: activeProductId 
+  }), [activeProductId]);
+
   return (
-    <DragDropContext.Provider value={{ draggedProduct: activeProductId }}>
+    <DragDropContext.Provider value={contextValue}>
       <DndContext
+        sensors={sensors}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
+        accessibility={{
+          restoreFocus: true,
+        }}
       >
         {children}
         <DragOverlay>

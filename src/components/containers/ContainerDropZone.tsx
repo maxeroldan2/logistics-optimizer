@@ -4,7 +4,7 @@ import { Container, Product } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { calculateContainerScore } from '../../utils/calculations';
 import ScoreCard from '../common/ScoreCard';
-import { Package, Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import ConfirmDialog from '../common/ConfirmDialog';
 import { getIconByName } from '../common/IconSelector';
 
@@ -24,6 +24,11 @@ const ContainerDropZone: React.FC<ContainerDropZoneProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
     id: container.id,
+    data: {
+      type: 'container',
+      container,
+      accepts: ['product'],
+    },
   });
   
   const { config } = useAppContext();

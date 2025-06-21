@@ -23,9 +23,10 @@ import {
 import { Shipment } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { useAuth } from '../auth/AuthProvider';
+import type { User } from '@supabase/supabase-js';
 
 interface SidebarProps {
-  user: any;
+  user: User | null;
   subscriptionTier: string;
   savedShipments: Shipment[];
   currentShipment: Shipment | null;
@@ -379,7 +380,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleSidebar
 }) => {
   const { toggleSubscriptionTier } = useAppContext();
-  const { signOut } = useAuth();
+  useAuth();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -498,16 +499,18 @@ const Sidebar: React.FC<SidebarProps> = ({
       switch (sortBy) {
         case 'name':
           return a.name.localeCompare(b.name);
-        case 'score':
+        case 'score': {
           // Mock score calculation based on products/containers
           const scoreA = (a.products.length * 10) + (a.containers.length * 15);
           const scoreB = (b.products.length * 10) + (b.containers.length * 15);
           return scoreB - scoreA;
-        case 'profitMargin':
+        }
+        case 'profitMargin': {
           // Mock profit margin calculation
           const profitA = a.products.reduce((sum, p) => sum + (p.value || 0), 0);
           const profitB = b.products.reduce((sum, p) => sum + (p.value || 0), 0);
           return profitB - profitA;
+        }
         case 'lastModified':
         default:
           return b.createdAt.getTime() - a.createdAt.getTime();
@@ -697,7 +700,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 )}
                 
                 {/* Folder shipments (hidden by default) */}
-                {isExpanded && folderShipments.map((shipment, index) => (
+                {isExpanded && folderShipments.map((shipment) => (
                   <div 
                     key={shipment.id}
                     className={`relative ml-4 p-3 rounded-md cursor-pointer transition-colors ${
@@ -919,7 +922,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex-1"></div>
                 <select 
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) => setSortBy(e.target.value as 'lastModified' | 'name' | 'score' | 'profitMargin')}
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="lastModified">Sort by: Last Modified</option>
@@ -942,7 +945,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </p>
                   </div>
                 ) : (
-                  filteredAndSortedShipments.map((shipment, index) => {
+                  filteredAndSortedShipments.map((shipment) => {
                     const isActive = savedShipments.indexOf(shipment) === 0; // First shipment in original list is active
                     const score = (shipment.products.length * 10) + (shipment.containers.length * 15);
                     const profitMargin = shipment.products.reduce((sum, p) => sum + (p.value || 0), 0) / 100;

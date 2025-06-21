@@ -17,6 +17,7 @@ export const useShipmentManagement = () => {
 
   const handleDuplicateProduct = (product: Product) => {
     // Return the product without id for duplication
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...productWithoutId } = product;
     return productWithoutId;
   };

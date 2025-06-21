@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../components/auth/AuthProvider';
 import { useAppContext } from '../context/AppContext';
-import { formatCurrency, formatPercentage } from '../utils/calculations';
+import { formatCurrency } from '../utils/calculations';
 
 const MinimalHome: React.FC = () => {
   const { user } = useAuth();
   const { 
     currentShipment, 
-    savedShipments,
     createNewShipment, 
     addProduct,
     addContainer,
@@ -16,8 +15,6 @@ const MinimalHome: React.FC = () => {
     config
   } = useAppContext();
 
-  const [showAddProduct, setShowAddProduct] = useState(false);
-  const [showAddContainer, setShowAddContainer] = useState(false);
 
   React.useEffect(() => {
     if (!currentShipment) {
@@ -154,7 +151,7 @@ const MinimalHome: React.FC = () => {
                 <p className="text-gray-500 text-center py-8">No products added yet</p>
               ) : (
                 <div className="space-y-4">
-                  {currentShipment.products.map((product, index) => (
+                  {currentShipment.products.map((product) => (
                     <div key={product.id} className="border border-gray-200 rounded p-4">
                       <h3 className="font-medium text-gray-900">{product.name}</h3>
                       <div className="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600">
@@ -188,7 +185,7 @@ const MinimalHome: React.FC = () => {
                 <p className="text-gray-500 text-center py-8">No containers added yet</p>
               ) : (
                 <div className="space-y-4">
-                  {currentShipment.containers.map((container, index) => (
+                  {currentShipment.containers.map((container) => (
                     <div key={container.id} className="border border-gray-200 rounded p-4">
                       <h3 className="font-medium text-gray-900">{container.name}</h3>
                       <div className="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600">

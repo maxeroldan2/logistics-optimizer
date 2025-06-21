@@ -7,7 +7,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onSettingsClick }) => {
-  const { isPremiumUser } = useAppContext();
+  useAppContext();
   
   return (
     <header className="bg-white shadow-sm">
@@ -45,3 +45,5 @@ const Header: React.FC<HeaderProps> = ({ onSettingsClick }) => {
     </header>
   );
 };
+
+export default Header;

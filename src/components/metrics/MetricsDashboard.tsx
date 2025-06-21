@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, DollarSign, BarChart3, Package, Target } from 'lucide-react';
+import { TrendingUp, DollarSign, BarChart3, Package } from 'lucide-react';
 import { Shipment, GlobalConfig } from '../../types';
 import { calculateShipmentScore, formatCurrency, formatPercentage } from '../../utils/calculations';
 

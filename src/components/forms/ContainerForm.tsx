@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, ChevronUp, Search, Package, Plane, Briefcase, Ship, Heart } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, Search, Package, Heart } from 'lucide-react';
 import { Container } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { useSavedContainers } from '../../hooks/useSavedContainers';
@@ -19,7 +19,7 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
   onCancel,
   isOpen = false
 }) => {
-  const { config } = useAppContext();
+  useAppContext();
   const { savedContainers, savedContainerToContainer, saveContainer } = useSavedContainers();
   
   const [formData, setFormData] = useState<Omit<Container, 'id' | 'products'>>({
@@ -205,7 +205,7 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
     }
   };
 
-  const applySavedContainer = (savedContainer: any) => {
+  const applySavedContainer = (savedContainer: typeof savedContainers[0]) => {
     const containerData = savedContainerToContainer(savedContainer);
     
     setFormData(prev => ({

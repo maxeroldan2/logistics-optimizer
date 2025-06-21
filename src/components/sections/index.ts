@@ -1,3 +1,3 @@
-export { default as ProductsSection } from './ProductsSection';
-export { default as ContainersSection } from './ContainersSection';
+export { ProductsSectionRefactored as ProductsSection } from './products';
+export { ContainersSectionRefactored as ContainersSection } from './containers';
 export { default as MarketAnalysisSection } from './MarketAnalysisSection';

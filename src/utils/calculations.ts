@@ -1,7 +1,7 @@
 // Utility functions for calculations
 
 import { Container, Product, ProductScore, ShipmentScore, ContainerScore, Shipment, DumpingCalculation } from '../types';
-import { calculateShipmentDumping, calculateMarketDemandModifier } from './dumpingCalculations';
+import { calculateShipmentDumping } from './dumpingCalculations';
 
 export const calculateProductVolume = (product: Product): number => {
   const { height, width, length } = product;

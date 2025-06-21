@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { SavedProduct, Product } from '../types';
 import { useAuth } from '../components/auth/AuthProvider';
@@ -10,7 +10,7 @@ export const useSavedProducts = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch user's saved products
-  const fetchSavedProducts = async () => {
+  const fetchSavedProducts = useCallback(async () => {
     if (!user) return;
     
     // Check if using placeholder credentials
@@ -41,7 +41,7 @@ export const useSavedProducts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   // Save a product as a preset
   const saveProduct = async (product: Product, description?: string, tags?: string[]) => {
@@ -178,7 +178,7 @@ export const useSavedProducts = () => {
   // Load saved products when user changes
   useEffect(() => {
     fetchSavedProducts();
-  }, [user]);
+  }, [user, fetchSavedProducts]);
 
   return {
     savedProducts,

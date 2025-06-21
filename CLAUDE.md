@@ -13,10 +13,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Environment Setup
 - Create `.env` file with Supabase credentials:
   ```
-  VITE_SUPABASE_URL=your_supabase_url
+  VITE_SUPABASE_URL=http://127.0.0.1:54321
   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+  VITE_FORCE_REAL_AUTH=true
   ```
-- App runs with placeholder credentials for development if env vars missing
+- Local development uses Supabase local instance
+- Test user credentials: demo@example.com / demo123
+
+### Supabase Development
+- `npm run supabase:start` - Start local Supabase (requires Supabase CLI)
+- `npm run supabase:stop` - Stop local Supabase
+- `npm run supabase:reset` - Reset database to migrations
+- `npm run supabase:studio` - Open Supabase Studio (http://127.0.0.1:54323)
+- `npm run supabase:status` - Check local Supabase status
 
 ## Architecture Overview
 
@@ -68,9 +77,13 @@ This is a **Logistics Investment Optimizer** - a React TypeScript application fo
 - Product assignment updates flow through drag drop system
 
 ### Database Schema (Supabase)
-- Authentication handled via Supabase Auth
-- Migrations in `supabase/migrations/` define schema
-- User subscription data determines feature access
+- **Authentication**: Supabase Auth with RLS policies for data isolation
+- **Migrations**: Located in `supabase/migrations/` for schema versioning
+- **Tables**: users, shipments, user_settings with proper foreign key relationships
+- **Local Development**: Uses local Supabase instance on port 54321
+- **Production**: Configured for real database persistence
+- **Data Persistence**: All shipments, products, containers saved to PostgreSQL
+- **Row Level Security**: Each user only accesses their own data
 
 ### Key Dependencies
 - **@dnd-kit/core** - Drag and drop functionality
@@ -94,9 +107,25 @@ This is a **Logistics Investment Optimizer** - a React TypeScript application fo
 **Subscription Logic:**
 - Check `subscriptionTier` before enabling premium features
 - Use `isFeatureAvailable()` helper for feature gating
-- Mock premium mode available for development by defaulting to premium tier
+- Free users: 1 shipment limit, basic features only
+- Premium users: Unlimited shipments, dumping penalizer, AI dimensions, market analysis
+- Subscription data persisted in database with real-time checking
 
-**Component Refactoring:**
-- Large components extracted into smaller pieces (Header, Sidebar, Dashboard sections)
-- Drag drop functionality preserved during refactoring
-- Custom hooks manage complex state interactions
+**Production Database Mode:**
+- Application now uses real Supabase database instead of localStorage
+- Authentication required for all operations
+- Data persists across sessions and devices
+- Multi-user support with proper data isolation
+- Row Level Security enforces user-specific data access
+
+**Development vs Production:**
+- Local development uses Supabase local instance (port 54321)
+- Environment variables control authentication mode
+- Test user available for development: demo@example.com / demo123
+- Database migrations handle schema changes
+
+**State Persistence:**
+- All shipment data automatically saved to database
+- Real-time updates when shipment data changes
+- User settings and subscription status persisted
+- Fallback to localStorage disabled in production mode

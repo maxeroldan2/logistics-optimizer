@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { GlobalConfig, Product, Container, Shipment, UserSubscription, FeatureLimits, FREE_LIMITS, PREMIUM_LIMITS, SubscriptionTier } from '../types';
-import { calculateShipmentScore, calculateProductScore } from '../utils/calculations';
+// Removed unused calculation imports
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../components/auth/AuthProvider';
 
@@ -76,14 +76,95 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('free');
   const [subscriptionLoading, setSubscriptionLoading] = useState<boolean>(true);
   
-  // Feature limits based on subscription
-  const featureLimits = subscriptionTier === 'premium' ? PREMIUM_LIMITS : FREE_LIMITS;
-  const isPremiumUser = subscriptionTier === 'premium';
+  // Feature limits based on subscription - memoized for performance
+  const featureLimits = useMemo(() => 
+    subscriptionTier === 'premium' ? PREMIUM_LIMITS : FREE_LIMITS,
+    [subscriptionTier]
+  );
+  const isPremiumUser = useMemo(() => 
+    subscriptionTier === 'premium',
+    [subscriptionTier]
+  );
   
   // Premium features state - restricted by subscription
   const [dumpingPenalizerEnabled, setDumpingPenalizerEnabled] = useState<boolean>(false);
   const [aiDimensionsEnabled, setAiDimensionsEnabled] = useState<boolean>(false);
   const [marketAnalysisEnabled, setMarketAnalysisEnabled] = useState<boolean>(false);
+
+  // Define loadSavedShipments first before it's used in any useEffect
+  const loadSavedShipments = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      console.log('📦 Loading saved shipments...');
+      
+      // Check if we should use localStorage (placeholder credentials, mock auth, or forced localStorage mode)
+      const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
+                           import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+      const isMockAuth = user?.id.startsWith('60abafe0-') || user?.id.includes('mock');
+      const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
+      
+      if (isPlaceholder || isMockAuth || forceLocalStorage) {
+        console.log('📝 Loading shipments from localStorage (placeholder mode)');
+        
+        // Load saved shipments from localStorage
+        const savedShipmentsKey = `savedShipments_${user.id}`;
+        const savedData = localStorage.getItem(savedShipmentsKey);
+        
+        if (savedData) {
+          try {
+            const parsedShipments = JSON.parse(savedData);
+            // Convert date strings back to Date objects
+            const shipmentsWithDates = parsedShipments.map((shipment: Omit<Shipment, 'createdAt'> & { createdAt: string }) => ({
+              ...shipment,
+              createdAt: new Date(shipment.createdAt)
+            }));
+            // Sort by created date descending (most recent first)
+            const sortedShipments = shipmentsWithDates.sort((a: Shipment, b: Shipment) => b.createdAt.getTime() - a.createdAt.getTime());
+            console.log(`📋 Found ${sortedShipments.length} saved shipments in localStorage`);
+            setSavedShipments(sortedShipments);
+          } catch (error) {
+            console.error('Error parsing saved shipments from localStorage:', error);
+            setSavedShipments([]);
+          }
+        } else {
+          console.log('📝 No saved shipments found, using empty list');
+          setSavedShipments([]);
+        }
+        return;
+      }
+
+      // Load shipments from Supabase
+      const { data, error } = await supabase
+        .from('shipments')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('❌ Error loading shipments:', error);
+        return;
+      }
+
+      if (data) {
+        // Convert Supabase data to Shipment objects
+        const shipments: Shipment[] = data.map(row => ({
+          id: row.id,
+          name: row.name,
+          folderId: row.folder_id,
+          products: row.products || [],
+          containers: row.containers || [],
+          createdAt: new Date(row.created_at),
+          isPremium: subscriptionTier === 'premium'
+        }));
+
+        setSavedShipments(shipments);
+        console.log(`✅ Loaded ${shipments.length} shipments from database`);
+      }
+    } catch (error) {
+      console.error('❌ Failed to load shipments:', error);
+    }
+  }, [user, subscriptionTier]);
 
   // Load subscription data when user changes
   useEffect(() => {
@@ -99,13 +180,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       try {
         setSubscriptionLoading(true);
         
-        // Check if we're using placeholder credentials
+        // Check if we should use localStorage (placeholder credentials, mock auth, or forced localStorage mode)
         const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
                              import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+        const isMockAuth = user?.id.startsWith('60abafe0-') || user?.id.includes('mock');
+        const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
         
-        if (isPlaceholder) {
-          // For development, default to premium tier for full functionality testing
-          console.log('🚀 Development mode: Using premium tier for testing');
+        if (isPlaceholder || isMockAuth || forceLocalStorage) {
+          // For development or mock auth, default to premium tier for full functionality testing
+          console.log('🚀 Mock auth mode: Using premium tier for testing');
           setSubscription(null);
           setSubscriptionTier('premium');
           setSubscriptionLoading(false);
@@ -148,13 +231,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const loadUserSettings = async () => {
       try {
-        // Check if we're using placeholder credentials
+        // Check if we should use localStorage (placeholder credentials, mock auth, or forced localStorage mode)
         const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
                              import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+        const isMockAuth = user?.id.startsWith('60abafe0-') || user?.id.includes('mock');
+        const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
         
-        if (isPlaceholder) {
-          // For development, use default config
-          setConfig(defaultConfig);
+        if (isPlaceholder || isMockAuth || forceLocalStorage) {
+          // For development or mock auth, use default config and localStorage
+          console.log('📝 Using localStorage for user settings (mock auth mode)');
+          const settingsKey = `userSettings_${user.id}`;
+          const savedSettings = localStorage.getItem(settingsKey);
+          
+          if (savedSettings) {
+            try {
+              const parsedSettings = JSON.parse(savedSettings);
+              setConfig(parsedSettings);
+            } catch {
+              setConfig(defaultConfig);
+              localStorage.setItem(settingsKey, JSON.stringify(defaultConfig));
+            }
+          } else {
+            setConfig(defaultConfig);
+            localStorage.setItem(settingsKey, JSON.stringify(defaultConfig));
+          }
           return;
         }
 
@@ -200,121 +300,70 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadSubscriptionData();
     loadUserSettings();
     loadSavedShipments();
-  }, [user]);
+  }, [user, loadSavedShipments]);
 
-  // Initialize default shipment for new users after subscription data loads
+  // Initialize shipment - load most recent or create new for first-time users
+
   useEffect(() => {
-    if (user && !subscriptionLoading && !currentShipment && savedShipments.length === 0) {
-      console.log('🚀 Initializing default shipment for new user');
-      setCurrentShipment({
-        ...defaultShipment,
-        id: uuidv4(),
-        createdAt: new Date()
-      });
+    if (user && !subscriptionLoading && !currentShipment) {
+      if (savedShipments.length > 0) {
+        // Load the most recent shipment (first in array since they're sorted by created_at desc)
+        const mostRecentShipment = savedShipments[0];
+        console.log(`📂 Loading most recent shipment: "${mostRecentShipment.name}"`);
+        setCurrentShipment(mostRecentShipment);
+      } else {
+        // Create default shipment only for completely new users
+        console.log('🚀 Initializing default shipment for new user');
+        setCurrentShipment({
+          ...defaultShipment,
+          id: uuidv4(),
+          createdAt: new Date()
+        });
+      }
     }
-  }, [user, subscriptionLoading, currentShipment, savedShipments.length]);
+  }, [user, subscriptionLoading, currentShipment, savedShipments]);
 
-  const loadSavedShipments = async () => {
-    if (!user) return;
-
-    try {
-      console.log('📦 Loading saved shipments...');
-      
-      // Check if we're using placeholder credentials
-      const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
-                           import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
-      
-      if (isPlaceholder) {
-        console.log('📝 Loading shipments from localStorage (placeholder mode)');
-        
-        // Load saved shipments from localStorage
-        const savedShipmentsKey = `savedShipments_${user.id}`;
-        const savedData = localStorage.getItem(savedShipmentsKey);
-        
-        if (savedData) {
-          try {
-            const parsedShipments = JSON.parse(savedData);
-            // Convert date strings back to Date objects
-            const shipmentsWithDates = parsedShipments.map((shipment: any) => ({
-              ...shipment,
-              createdAt: new Date(shipment.createdAt)
-            }));
-            console.log(`📋 Found ${shipmentsWithDates.length} saved shipments in localStorage`);
-            setSavedShipments(shipmentsWithDates);
-          } catch (error) {
-            console.error('Error parsing saved shipments from localStorage:', error);
-            setSavedShipments([]);
-          }
-        } else {
-          console.log('📝 No saved shipments found, using empty list');
-          setSavedShipments([]);
-        }
-        return;
-      }
-
-      // Load shipments from Supabase
-      const { data, error } = await supabase
-        .from('shipments')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('❌ Error loading shipments:', error);
-        return;
-      }
-
-      if (data) {
-        // Convert Supabase data to Shipment objects
-        const shipments: Shipment[] = data.map(row => ({
-          id: row.id,
-          name: row.name,
-          folderId: row.folder_id,
-          products: row.products || [],
-          containers: row.containers || [],
-          createdAt: new Date(row.created_at),
-          isPremium: subscriptionTier === 'premium'
-        }));
-
-        setSavedShipments(shipments);
-        console.log(`✅ Loaded ${shipments.length} shipments from database`);
-      }
-    } catch (error) {
-      console.error('❌ Failed to load shipments:', error);
-    }
-  };
-
-  const updateConfig = async (newConfig: Partial<GlobalConfig>) => {
+  const updateConfig = useCallback(async (newConfig: Partial<GlobalConfig>) => {
     const updatedConfig = { ...config, ...newConfig };
     setConfig(updatedConfig);
 
     if (user) {
-      const { error } = await supabase
-        .from('user_settings')
-        .upsert({
-          user_id: user.id,
-          measurement: updatedConfig.measurement,
-          currency: updatedConfig.currency,
-          language: updatedConfig.language,
-          show_tooltips: updatedConfig.showTooltips
-        });
+      // Check if we should use localStorage (placeholder credentials, mock auth, or forced localStorage mode)
+      const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
+                           import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+      const isMockAuth = user?.id.startsWith('60abafe0-') || user?.id.includes('mock');
+      const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
+      
+      if (isPlaceholder || isMockAuth || forceLocalStorage) {
+        // Save to localStorage for mock auth
+        const settingsKey = `userSettings_${user.id}`;
+        localStorage.setItem(settingsKey, JSON.stringify(updatedConfig));
+        console.log('📝 Saved user settings to localStorage');
+      } else {
+        // Save to Supabase for real auth
+        const { error } = await supabase
+          .from('user_settings')
+          .upsert({
+            user_id: user.id,
+            measurement: updatedConfig.measurement,
+            currency: updatedConfig.currency,
+            language: updatedConfig.language,
+            show_tooltips: updatedConfig.showTooltips
+          });
 
-      if (error) {
-        console.error('Error updating user settings:', error);
+        if (error) {
+          console.error('Error updating user settings:', error);
+        }
       }
     }
-  };
+  }, [config, user]);
 
-  const createNewShipment = () => {
+  const createNewShipment = useCallback(() => {
     // Check if user can create a new shipment
-    if (!canCreateShipment()) {
+    if (savedShipments.length >= featureLimits.maxShipments && featureLimits.maxShipments !== -1) {
       console.warn('Cannot create shipment: limit reached for current subscription tier');
       const maxShipments = featureLimits.maxShipments;
-      if (maxShipments === -1) {
-        alert('Unable to create shipment. Please try again.');
-      } else {
-        alert(`You've reached the limit of ${maxShipments} shipment${maxShipments === 1 ? '' : 's'} for your ${subscriptionTier} plan. Upgrade to Premium for unlimited shipments!`);
-      }
+      alert(`You've reached the limit of ${maxShipments} shipment${maxShipments === 1 ? '' : 's'} for your ${subscriptionTier} plan. Upgrade to Premium for unlimited shipments!`);
       return;
     }
 
@@ -324,19 +373,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       createdAt: new Date(),
       isPremium: isPremiumUser
     });
-  };
+  }, [savedShipments.length, featureLimits.maxShipments, subscriptionTier, isPremiumUser]);
 
-  const saveCurrentShipment = async () => {
+  const saveCurrentShipment = useCallback(async () => {
     if (!currentShipment || !user) return;
     
     try {
-      console.log('🚀 Saving shipment to Supabase...');
+      console.log('🚀 Saving shipment...');
       
-      // Check if we're using placeholder credentials
+      // Check if we should use localStorage (placeholder credentials, mock auth, or forced localStorage mode)
       const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
                            import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+      const isMockAuth = user?.id.startsWith('60abafe0-') || user?.id.includes('mock');
+      const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
       
-      if (isPlaceholder) {
+      if (isPlaceholder || isMockAuth || forceLocalStorage) {
         console.log('📝 Saving to localStorage (placeholder mode)');
         
         // Update the saved shipments list
@@ -433,32 +484,77 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       console.error('❌ Failed to save shipment:', error);
       // Could show user notification here
     }
-  };
+  }, [currentShipment, user, savedShipments, config]);
 
-  const loadShipment = (shipment: Shipment) => {
+  const loadShipment = useCallback((shipment: Shipment) => {
     setCurrentShipment(shipment);
-  };
+  }, []);
 
-  const updateShipmentName = (name: string) => {
+  const updateShipmentName = useCallback((name: string) => {
     if (!currentShipment) return;
     setCurrentShipment(prev => prev ? { ...prev, name } : null);
-  };
+  }, [currentShipment]);
 
-  const updateShipment = (updates: {
+  const updateShipment = useCallback(async (updates: {
     name?: string;
     description?: string;
     folderId?: string;
     shippingDate?: string;
   }) => {
     if (!currentShipment) return;
-    setCurrentShipment(prev => prev ? { ...prev, ...updates } : null);
-  };
+    
+    // Update current shipment with new timestamp to mark as recently modified
+    const updatedShipment = { 
+      ...currentShipment, 
+      ...updates,
+      createdAt: new Date() // Update timestamp to move to top of list
+    };
+    setCurrentShipment(updatedShipment);
+    
+    // Auto-save to keep sidebar in sync
+    try {
+      // Check if we should use localStorage (placeholder credentials, mock auth, or forced localStorage mode)
+      const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
+                           import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+      const isMockAuth = user?.id.startsWith('60abafe0-') || user?.id.includes('mock');
+      const forceLocalStorage = import.meta.env.VITE_FORCE_LOCALSTORAGE === 'true';
+      
+      if (isPlaceholder || isMockAuth || forceLocalStorage) {
+        // Update localStorage immediately for better UX
+        const existingIndex = savedShipments.findIndex(s => s.id === updatedShipment.id);
+        if (existingIndex >= 0) {
+          const updatedSavedShipments = [...savedShipments];
+          updatedSavedShipments[existingIndex] = updatedShipment;
+          // Re-sort to ensure most recently updated appears first
+          const sortedShipments = updatedSavedShipments.sort((a: Shipment, b: Shipment) => b.createdAt.getTime() - a.createdAt.getTime());
+          setSavedShipments(sortedShipments);
+          
+          // Save to localStorage
+          const savedShipmentsKey = `savedShipments_${user?.id}`;
+          localStorage.setItem(savedShipmentsKey, JSON.stringify(sortedShipments));
+          console.log(`💾 Auto-saved shipment "${updatedShipment.name}" to localStorage`);
+        }
+      } else {
+        // For real Supabase, also auto-update the saved shipments list
+        const existingIndex = savedShipments.findIndex(s => s.id === updatedShipment.id);
+        if (existingIndex >= 0) {
+          const updatedSavedShipments = [...savedShipments];
+          updatedSavedShipments[existingIndex] = updatedShipment;
+          // Re-sort to ensure most recently updated appears first
+          const sortedShipments = updatedSavedShipments.sort((a: Shipment, b: Shipment) => b.createdAt.getTime() - a.createdAt.getTime());
+          setSavedShipments(sortedShipments);
+        }
+      }
+    } catch (error) {
+      console.error('Error auto-saving shipment updates:', error);
+    }
+  }, [currentShipment, savedShipments, user]);
 
-  const addProduct = (product: Omit<Product, 'id'>) => {
+  const addProduct = useCallback((product: Omit<Product, 'id'>) => {
     if (!currentShipment) return;
     
     // Check if user can add more products
-    if (!canAddProduct()) {
+    if (currentShipment.products.length >= featureLimits.maxProductsPerShipment && featureLimits.maxProductsPerShipment !== -1) {
       console.warn('Cannot add product: limit reached for current subscription tier');
       return;
     }
@@ -468,48 +564,63 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       id: uuidv4()
     };
     
-    setCurrentShipment(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        products: [...prev.products, newProduct]
-      };
-    });
-  };
+    const updatedShipment = {
+      ...currentShipment,
+      products: [...currentShipment.products, newProduct]
+    };
+    
+    setCurrentShipment(updatedShipment);
+    
+    // Auto-update sidebar by updating savedShipments
+    const existingIndex = savedShipments.findIndex(s => s.id === updatedShipment.id);
+    if (existingIndex >= 0) {
+      const updatedSavedShipments = [...savedShipments];
+      updatedSavedShipments[existingIndex] = updatedShipment;
+      setSavedShipments(updatedSavedShipments);
+    }
+  }, [currentShipment, featureLimits.maxProductsPerShipment, savedShipments]);
 
-  const updateProduct = (id: string, productUpdates: Partial<Product>) => {
+  const updateProduct = useCallback((id: string, productUpdates: Partial<Product>) => {
     if (!currentShipment) return;
     
-    setCurrentShipment(prev => {
-      if (!prev) return null;
+    let updatedShipment: Shipment;
+    
+    const updatedProducts = currentShipment.products.map(product => 
+      product.id === id ? { ...product, ...productUpdates } : product
+    );
+    
+    if ('containerId' in productUpdates) {
+      const updatedContainers = currentShipment.containers.map(container => ({
+        ...container,
+        products: container.id === productUpdates.containerId
+          ? [...container.products, id]
+          : container.products.filter(pid => pid !== id)
+      }));
       
-      const updatedProducts = prev.products.map(product => 
-        product.id === id ? { ...product, ...productUpdates } : product
-      );
-      
-      if ('containerId' in productUpdates) {
-        const updatedContainers = prev.containers.map(container => ({
-          ...container,
-          products: container.id === productUpdates.containerId
-            ? [...container.products, id]
-            : container.products.filter(pid => pid !== id)
-        }));
-        
-        return {
-          ...prev,
-          products: updatedProducts,
-          containers: updatedContainers
-        };
-      }
-      
-      return {
-        ...prev,
+      updatedShipment = {
+        ...currentShipment,
+        products: updatedProducts,
+        containers: updatedContainers
+      };
+    } else {
+      updatedShipment = {
+        ...currentShipment,
         products: updatedProducts
       };
-    });
-  };
+    }
+    
+    setCurrentShipment(updatedShipment);
+    
+    // Auto-update sidebar by updating savedShipments
+    const existingIndex = savedShipments.findIndex(s => s.id === updatedShipment.id);
+    if (existingIndex >= 0) {
+      const updatedSavedShipments = [...savedShipments];
+      updatedSavedShipments[existingIndex] = updatedShipment;
+      setSavedShipments(updatedSavedShipments);
+    }
+  }, [currentShipment, savedShipments]);
 
-  const removeProduct = (id: string) => {
+  const removeProduct = useCallback((id: string) => {
     if (!currentShipment) return;
     
     setCurrentShipment(prev => {
@@ -526,33 +637,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         containers: updatedContainers
       };
     });
-  };
+  }, [currentShipment]);
 
-  const addContainer = (container: Omit<Container, 'id' | 'products'>) => {
-    if (!currentShipment) return;
-    
-    // Check if user can add more containers
-    if (!canAddContainer()) {
-      console.warn('Cannot add container: limit reached for current subscription tier');
-      return;
-    }
-    
-    const newContainer: Container = {
-      ...container,
-      id: uuidv4(),
-      products: []
-    };
-    
-    setCurrentShipment(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        containers: [...prev.containers, newContainer]
-      };
-    });
-  };
 
-  const updateContainer = (id: string, containerUpdates: Partial<Container>) => {
+  const updateContainer = useCallback((id: string, containerUpdates: Partial<Container>) => {
     if (!currentShipment) return;
     
     setCurrentShipment(prev => {
@@ -565,9 +653,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         )
       };
     });
-  };
+  }, [currentShipment]);
 
-  const removeContainer = (id: string) => {
+  const removeContainer = useCallback((id: string) => {
     if (!currentShipment) return;
     
     setCurrentShipment(prev => {
@@ -583,33 +671,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         products: updatedProducts
       };
     });
-  };
+  }, [currentShipment]);
 
-  const toggleDumpingPenalizer = () => {
+  const toggleDumpingPenalizer = useCallback(() => {
     if (!featureLimits.hasDumpingPenalizer) {
       console.warn('Dumping penalizer not available for current subscription tier');
       return;
     }
     setDumpingPenalizerEnabled(prev => !prev);
-  };
+  }, [featureLimits.hasDumpingPenalizer]);
 
-  const toggleAiDimensions = () => {
+  const toggleAiDimensions = useCallback(() => {
     if (!featureLimits.hasAiDimensions) {
       console.warn('AI dimensions not available for current subscription tier');
       return;
     }
     setAiDimensionsEnabled(prev => !prev);
-  };
+  }, [featureLimits.hasAiDimensions]);
 
-  const toggleMarketAnalysis = () => {
+  const toggleMarketAnalysis = useCallback(() => {
     if (!featureLimits.hasMarketAnalysis) {
       console.warn('Market analysis not available for current subscription tier');
       return;
     }
     setMarketAnalysisEnabled(prev => !prev);
-  };
+  }, [featureLimits.hasMarketAnalysis]);
 
-  const toggleSubscriptionTier = () => {
+  const toggleSubscriptionTier = useCallback(() => {
     // Only allow in development mode
     const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
                          import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
@@ -622,31 +710,62 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const newTier = subscriptionTier === 'free' ? 'premium' : 'free';
     setSubscriptionTier(newTier);
     console.log(`🔄 Development mode: Switched to ${newTier} tier`);
-  };
+  }, [subscriptionTier]);
 
   // Feature availability checking functions
-  const isFeatureAvailable = (feature: keyof FeatureLimits): boolean => {
+  const isFeatureAvailable = useCallback((feature: keyof FeatureLimits): boolean => {
     return featureLimits[feature] as boolean;
-  };
+  }, [featureLimits]);
 
-  const canCreateShipment = (): boolean => {
+  const canCreateShipment = useCallback((): boolean => {
     if (featureLimits.maxShipments === -1) return true; // unlimited
     return savedShipments.length < featureLimits.maxShipments;
-  };
+  }, [featureLimits.maxShipments, savedShipments.length]);
 
-  const canAddProduct = (): boolean => {
+  const canAddProduct = useCallback((): boolean => {
     if (!currentShipment) return true;
     if (featureLimits.maxProductsPerShipment === -1) return true; // unlimited
     return currentShipment.products.length < featureLimits.maxProductsPerShipment;
-  };
+  }, [currentShipment, featureLimits.maxProductsPerShipment]);
 
-  const canAddContainer = (): boolean => {
+  const canAddContainer = useCallback((): boolean => {
     if (!currentShipment) return true;
     if (featureLimits.maxContainersPerShipment === -1) return true; // unlimited
     return currentShipment.containers.length < featureLimits.maxContainersPerShipment;
-  };
+  }, [currentShipment, featureLimits.maxContainersPerShipment]);
 
-  const contextValue: AppContextType = {
+  const addContainer = useCallback((container: Omit<Container, 'id' | 'products'>) => {
+    if (!currentShipment) return;
+    
+    // Check if user can add more containers
+    if (!canAddContainer()) {
+      console.warn('Cannot add container: limit reached for current subscription tier');
+      return;
+    }
+    
+    const newContainer: Container = {
+      ...container,
+      id: uuidv4(),
+      products: []
+    };
+    
+    const updatedShipment = {
+      ...currentShipment,
+      containers: [...currentShipment.containers, newContainer]
+    };
+    
+    setCurrentShipment(updatedShipment);
+    
+    // Auto-update sidebar by updating savedShipments
+    const existingIndex = savedShipments.findIndex(s => s.id === updatedShipment.id);
+    if (existingIndex >= 0) {
+      const updatedSavedShipments = [...savedShipments];
+      updatedSavedShipments[existingIndex] = updatedShipment;
+      setSavedShipments(updatedSavedShipments);
+    }
+  }, [currentShipment, canAddContainer, savedShipments]);
+
+  const contextValue: AppContextType = useMemo(() => ({
     config,
     updateConfig,
     currentShipment,
@@ -681,7 +800,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     toggleMarketAnalysis,
     // Development mode functions
     toggleSubscriptionTier
-  };
+  }), [
+    config,
+    updateConfig,
+    currentShipment,
+    savedShipments,
+    createNewShipment,
+    saveCurrentShipment,
+    loadShipment,
+    updateShipmentName,
+    updateShipment,
+    addProduct,
+    updateProduct,
+    removeProduct,
+    addContainer,
+    updateContainer,
+    removeContainer,
+    subscription,
+    subscriptionTier,
+    featureLimits,
+    isFeatureAvailable,
+    canCreateShipment,
+    canAddProduct,
+    canAddContainer,
+    isPremiumUser,
+    dumpingPenalizerEnabled,
+    toggleDumpingPenalizer,
+    aiDimensionsEnabled,
+    toggleAiDimensions,
+    marketAnalysisEnabled,
+    toggleMarketAnalysis,
+    toggleSubscriptionTier
+  ]);
 
   // Show loading screen while subscription data is loading
   if (subscriptionLoading && user) {
@@ -703,6 +853,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = (): AppContextType => {
   const context = useContext(AppContext);
   if (context === undefined) {

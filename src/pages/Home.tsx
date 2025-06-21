@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import GlobalSettings from '../components/config/GlobalSettings';
-import { DragDropProvider, DragAndDropSection } from '../components/dragdrop';
+import { DragDropProvider } from '../components/dragdrop';
 import { ProductsSection, ContainersSection, MarketAnalysisSection } from '../components/sections';
-import Sidebar from '../components/layout/Sidebar';
-import ShipmentHeader from '../components/shipment/ShipmentHeader';
+import SidebarRefactored from '../components/layout/SidebarRefactored';
+import ShipmentHeader from '../components/shipment/header';
 import { useShipmentManagement, useFolderManagement } from '../hooks';
-import { Product, Container } from '../types';
+import { Product } from '../types';
 import { useAuth } from '../components/auth/AuthProvider';
 
 const Home: React.FC = () => {
@@ -17,7 +17,6 @@ const Home: React.FC = () => {
     createNewShipment, 
     saveCurrentShipment,
     loadShipment,
-    updateShipmentName,
     updateShipment,
     addProduct,
     updateProduct,
@@ -40,7 +39,6 @@ const Home: React.FC = () => {
   const {
     editingProduct,
     editingContainer,
-    selectedProduct,
     handleEditProduct,
     handleEditContainer,
     handleDuplicateProduct,
@@ -61,10 +59,12 @@ const Home: React.FC = () => {
   
   // All hooks must be called before any early returns
   React.useEffect(() => {
-    if (!currentShipment) {
+    if (!currentShipment && savedShipments.length === 0) {
+      // Only create new shipment if there are no saved shipments
+      // AppContext will handle loading the most recent shipment if available
       createNewShipment();
     }
-  }, [currentShipment, createNewShipment]);
+  }, [currentShipment, createNewShipment, savedShipments.length]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -75,11 +75,11 @@ const Home: React.FC = () => {
   };
 
   const handleCurrencyChange = (currency: string) => {
-    updateConfig({ currency: currency as any });
+    updateConfig({ currency: currency as 'USD' | 'EUR' | 'GBP' });
   };
 
   const handleMeasurementChange = (measurement: string) => {
-    updateConfig({ measurement: measurement as any });
+    updateConfig({ measurement: measurement as 'metric' | 'imperial' });
   };
 
   const handleToggleSidebar = () => {
@@ -124,7 +124,7 @@ const Home: React.FC = () => {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       {sidebarVisible && (
-        <Sidebar
+        <SidebarRefactored
           user={user}
           subscriptionTier={subscriptionTier}
           savedShipments={savedShipments}

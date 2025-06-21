@@ -19,8 +19,8 @@ const Login: React.FC = () => {
     try {
       await signIn(email, password);
       navigate('/');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }

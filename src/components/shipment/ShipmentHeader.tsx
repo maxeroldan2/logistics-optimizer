@@ -29,15 +29,15 @@ interface ShipmentHeaderProps {
 
 const ShipmentHeader: React.FC<ShipmentHeaderProps> = ({
   currentShipment,
-  config,
-  dumpingPenalizerEnabled,
+  config: _config, // eslint-disable-line @typescript-eslint/no-unused-vars
+  dumpingPenalizerEnabled: _dumpingPenalizerEnabled, // eslint-disable-line @typescript-eslint/no-unused-vars
   subscriptionTier,
   sidebarVisible = true,
   folders,
   currentFolderId,
   onUpdateShipment,
-  onCurrencyChange,
-  onMeasurementChange,
+  onCurrencyChange: _onCurrencyChange, // eslint-disable-line @typescript-eslint/no-unused-vars
+  onMeasurementChange: _onMeasurementChange, // eslint-disable-line @typescript-eslint/no-unused-vars
   onSettingsClick,
   onSaveShipment,
   onToggleSidebar
@@ -47,7 +47,7 @@ const ShipmentHeader: React.FC<ShipmentHeaderProps> = ({
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Calculate metrics
-  const { score, dumpingCalculations } = calculateCompleteShipmentScore(currentShipment);
+  const { score } = calculateCompleteShipmentScore(currentShipment);
   
   // Calculate if we have any data
   const hasProducts = currentShipment.products.length > 0;
@@ -69,8 +69,8 @@ const ShipmentHeader: React.FC<ShipmentHeaderProps> = ({
   };
 
   const handleSaveClick = () => {
-    // Allow dev account to save regardless of plan
-    const isDev = user?.email === 'dev@example.com';
+    // Allow dev and demo accounts to save regardless of plan
+    const isDev = user?.email === 'dev@example.com' || user?.email === 'demo@example.com';
     
     if (subscriptionTier === 'free' && !isDev) {
       setShowUpgradeModal(true);

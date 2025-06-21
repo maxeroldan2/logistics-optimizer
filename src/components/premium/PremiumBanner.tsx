@@ -4,7 +4,7 @@ import { useAppContext } from '../../context/AppContext';
 import { useSubscription } from '../../hooks/useSubscription';
 
 const PremiumBanner: React.FC = () => {
-  const { isPremiumUser, savedShipments } = useAppContext();
+  const { isPremiumUser } = useAppContext();
   const { handleUpgrade } = useSubscription();
   const [isOpen, setIsOpen] = React.useState(!isPremiumUser);
   

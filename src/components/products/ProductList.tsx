@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, Edit, Trash2, Box } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Product } from '../../types';
 import { calculateProductScore, formatCurrency } from '../../utils/calculations';
 import { useAppContext } from '../../context/AppContext';

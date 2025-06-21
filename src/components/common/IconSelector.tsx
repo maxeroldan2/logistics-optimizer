@@ -178,6 +178,7 @@ const IconSelector: React.FC<IconSelectorProps> = ({
 export default IconSelector;
 
 // Helper function to get icon component by name
+// eslint-disable-next-line react-refresh/only-export-components
 export const getIconByName = (iconName?: string) => {
   if (!iconName) return Package;
   const iconData = allIcons.find(icon => icon.name === iconName);

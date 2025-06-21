@@ -95,7 +95,6 @@ interface FeatureLimitReachedProps {
 
 export const FeatureLimitReached: React.FC<FeatureLimitReachedProps> = ({
   limitType,
-  currentCount,
   maxCount
 }) => {
   const { subscriptionTier } = useAppContext();

@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { X, Package, Sparkles, Search, Heart } from 'lucide-react';
+import { X, Package, Search, Heart } from 'lucide-react';
 import { Product } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { useSavedProducts } from '../../hooks/useSavedProducts';
 import { 
   allProductTemplates, 
-  getProductTemplateById, 
-  getProductCategories,
-  categoryDisplayNames 
+  getProductTemplateById
 } from '../../data/productTemplates';
 
 interface ProductFormProps {
@@ -25,7 +23,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onClose,
   isOpen = false
 }) => {
-  const { config, aiDimensionsEnabled } = useAppContext();
+  const { aiDimensionsEnabled } = useAppContext();
   const { savedProducts, savedProductToProduct, saveProduct } = useSavedProducts();
   
   const [product, setProduct] = useState<Omit<Product, 'id'>>({
@@ -107,64 +105,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     
     setProduct(prev => ({
       ...prev,
-      [name]: type === 'number' ? Number(value) : value
+      [name]: e.target.type === 'number' ? Number(value) : value
     }));
   };
 
 
-  const handleBoxedChange = (isBoxed: boolean) => {
-    setProduct(prev => {
-      if (isBoxed) {
-        // Add packaging dimensions using smart calculation
-        return {
-          ...prev,
-          isBoxed: true,
-          height: prev.height + getPackagingDimensions(prev.height, 'height'),
-          width: prev.width + getPackagingDimensions(prev.width, 'width'),
-          length: prev.length + getPackagingDimensions(prev.length, 'length'),
-          weight: prev.weight + getPackagingWeight(prev.weight)
-        };
-      } else {
-        // Remove packaging dimensions (approximate reverse calculation)
-        const newHeight = Math.max(1, prev.height - getPackagingDimensions(prev.height * 0.8, 'height'));
-        const newWidth = Math.max(1, prev.width - getPackagingDimensions(prev.width * 0.8, 'width'));
-        const newLength = Math.max(1, prev.length - getPackagingDimensions(prev.length * 0.8, 'length'));
-        const newWeight = Math.max(0.01, prev.weight - getPackagingWeight(prev.weight * 0.9));
-        
-        return {
-          ...prev,
-          isBoxed: false,
-          height: newHeight,
-          width: newWidth,
-          length: newLength,
-          weight: newWeight
-        };
-      }
-    });
-  };
 
   // Calculate packaging dimensions based on product size
-  const getPackagingDimensions = (dimension: number, type: 'height' | 'width' | 'length'): number => {
-    // Packaging adds different amounts based on product size
-    if (dimension <= 5) return 2; // Small items: +2cm
-    if (dimension <= 15) return 3; // Medium items: +3cm
-    if (dimension <= 30) return 4; // Large items: +4cm
-    return 5; // Extra large items: +5cm
-  };
-
-  // Calculate packaging weight based on product weight
-  const getPackagingWeight = (weight: number): number => {
-    // Packaging weight is proportional to product weight
-    if (weight <= 0.1) return 0.05; // Very light items: +50g
-    if (weight <= 0.5) return 0.1;  // Light items: +100g
-    if (weight <= 2) return 0.2;    // Medium items: +200g
-    if (weight <= 5) return 0.3;    // Heavy items: +300g
-    return weight * 0.1;            // Very heavy items: +10% of weight
-  };
 
 
   const applyPreset = (templateId: string) => {
@@ -193,7 +144,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setPresetSearchTerm('');
   };
 
-  const applySavedProduct = (savedProduct: any) => {
+  const applySavedProduct = (savedProduct: typeof savedProducts[0]) => {
     const productData = savedProductToProduct(savedProduct);
     
     setProduct(prev => ({
@@ -212,7 +163,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (!popularProduct) return;
 
     // Try to find a matching template from our database
-    let template = null;
+    let template: typeof allProductTemplates[0] | null = null;
     
     switch (productId) {
       case 'smartphones-gama-alta':
@@ -298,19 +249,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
     { id: 'cafeteras-capsulas', name: 'Cafeteras de Cápsulas', description: 'Nespresso, Dolce Gusto y compatibles.', emoji: '☕' }
   ];
 
-  const getFilteredPresets = () => {
-    let presets = allProductTemplates;
-
-    // Apply search filter
-    if (presetSearchTerm.trim()) {
-      presets = presets.filter(preset => 
-        preset.name.toLowerCase().includes(presetSearchTerm.toLowerCase()) ||
-        preset.category.toLowerCase().includes(presetSearchTerm.toLowerCase())
-      );
-    }
-
-    return presets;
-  };
 
   const getFilteredProductsForCategory = () => {
     // If searching, show filtered results from all categories
@@ -379,7 +317,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const getEmojiForTemplate = (template: any) => {
+  const getEmojiForTemplate = (template: typeof allProductTemplates[0]) => {
     // Map template categories and types to emojis
     switch (template.category) {
       case 'technology':

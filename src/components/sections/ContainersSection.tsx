@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, Package, Briefcase, Info } from 'lucide-react';
 import { useDroppable } from '@dnd-kit/core';
 import { Container, Product, GlobalConfig } from '../../types';
 import { formatCurrency } from '../../utils/calculations';
-import ContainerForm from '../forms/ContainerForm';
+import { ContainerFormRefactored } from '../forms/container';
 import { useDraggedProduct } from '../dragdrop/DragDropProvider';
 
 interface ContainersSectionProps {
@@ -241,7 +241,7 @@ const ContainersSection: React.FC<ContainersSectionProps> = ({
       </div>
 
       {/* Container Form Modal */}
-      <ContainerForm
+      <ContainerFormRefactored
         isOpen={showNewContainerForm}
         onAddContainer={container => {
           onAddContainer(container);
@@ -357,7 +357,7 @@ const ContainersSection: React.FC<ContainersSectionProps> = ({
 
       {/* Edit Container Modal */}
       {editingContainer && containerBeingEdited && (
-        <ContainerForm
+        <ContainerFormRefactored
           container={containerBeingEdited}
           isOpen={true}
           onUpdateContainer={updates => {

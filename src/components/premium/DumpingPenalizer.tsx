@@ -3,8 +3,7 @@ import { AlertTriangle, Settings, BarChart3, TrendingDown } from 'lucide-react';
 import { 
   DumpingSettings, 
   DumpingCalculation, 
-  DumpingModel, 
-  DEFAULT_DUMPING_SETTINGS 
+  DumpingModel 
 } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { useSubscription } from '../../hooks/useSubscription';

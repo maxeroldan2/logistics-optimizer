@@ -22,13 +22,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Check if we're using placeholder credentials
+  // Check if we're using placeholder credentials (excluding local Supabase development)
   const isPlaceholder = !import.meta.env.VITE_SUPABASE_URL || 
                        import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co';
+  const forceRealAuth = import.meta.env.VITE_FORCE_REAL_AUTH === 'true';
+  const useRealAuth = !isPlaceholder || forceRealAuth;
 
   const signIn = async (email: string, password: string) => {
-    if (isPlaceholder) {
-      // Development mode: require specific email/password for testing
+    if (!useRealAuth) {
+      // Mock authentication mode (placeholder credentials only)
       if (email === 'demo@example.com' && password === 'demo123') {
         const mockUser = createMockUser(email);
         setUser(mockUser);
@@ -40,14 +42,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Real Supabase authentication
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     
     // User will be set via the auth state change listener
   };
 
   const signUp = async (email: string, password: string) => {
-    if (isPlaceholder) {
+    if (!useRealAuth) {
       // Development mode: simulate registration with validation
       if (!email || !password) {
         throw new Error('Email and password are required');
@@ -82,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    if (isPlaceholder) {
+    if (!useRealAuth) {
       setUser(null);
       localStorage.removeItem('mockAuth');
       return;
@@ -92,40 +94,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const createMockUser = (email: string): User => {
-    // Create consistent ID based on email to ensure same user gets same ID
-    const consistentId = 'mock-' + btoa(email).replace(/[^a-zA-Z0-9]/g, '');
+    // Create consistent UUID-like ID based on email for PostgreSQL compatibility
+    // Generate a deterministic hex string from email
+    let hash = 0;
+    for (let i = 0; i < email.length; i++) {
+      hash = ((hash << 5) - hash + email.charCodeAt(i)) & 0xffffffff;
+    }
+    // Convert to positive hex and pad to 32 characters
+    const hexHash = Math.abs(hash).toString(16).padStart(8, '0').repeat(4).substring(0, 32);
+    const consistentId = [
+      hexHash.substring(0, 8),
+      hexHash.substring(8, 12),
+      hexHash.substring(12, 16),
+      hexHash.substring(16, 20),
+      hexHash.substring(20, 32)
+    ].join('-');
     
-    return {
+    // Create a mock user object that matches the User type from Supabase
+    const mockUser = {
       id: consistentId,
       email,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       app_metadata: {},
       user_metadata: {},
-    aud: 'authenticated',
-    confirmation_sent_at: null,
-    confirmed_at: new Date().toISOString(),
-    email_change_sent_at: null,
-    email_confirmed_at: new Date().toISOString(),
-    invited_at: null,
-    last_sign_in_at: new Date().toISOString(),
-    phone: null,
-    phone_change_sent_at: null,
-    phone_confirmed_at: null,
-    recovery_sent_at: null,
+      aud: 'authenticated',
+      confirmation_sent_at: undefined,
+      confirmed_at: new Date().toISOString(),
+      email_change_sent_at: undefined,
+      email_confirmed_at: new Date().toISOString(),
+      invited_at: undefined,
+      last_sign_in_at: new Date().toISOString(),
+      phone: undefined,
+      phone_change_sent_at: undefined,
+      phone_confirmed_at: undefined,
+      recovery_sent_at: undefined,
       role: 'authenticated'
-    } as User;
+    };
+    
+    return mockUser as User;
   };
 
   useEffect(() => {
-    if (isPlaceholder) {
+    if (!useRealAuth) {
       // Check for existing mock auth in localStorage
       const mockAuth = localStorage.getItem('mockAuth');
       if (mockAuth) {
         try {
           const user = JSON.parse(mockAuth);
           setUser(user);
-        } catch (error) {
+        } catch {
           localStorage.removeItem('mockAuth');
         }
       }
@@ -149,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [isPlaceholder]);
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
@@ -158,6 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

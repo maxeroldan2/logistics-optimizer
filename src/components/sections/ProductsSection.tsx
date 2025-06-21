@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Edit2, Trash2, GripVertical, HelpCircle, ChevronUp, ChevronDown, Heart, HeartOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical, HelpCircle, ChevronUp, ChevronDown, Heart } from 'lucide-react';
 import { useDraggable } from '@dnd-kit/core';
 import { Product, GlobalConfig } from '../../types';
 import { calculateProductScore, formatCurrency } from '../../utils/calculations';
-import ProductForm from '../forms/ProductForm';
+import { ProductFormRefactored } from '../forms/product';
 import { useSavedProducts } from '../../hooks/useSavedProducts';
 
 interface ProductsSectionProps {
@@ -206,12 +206,12 @@ const DraggableProductRow: React.FC<DraggableProductRowProps> = ({
 const ProductsSection: React.FC<ProductsSectionProps> = ({
   products,
   config,
-  aiDimensionsEnabled,
+  aiDimensionsEnabled: _aiDimensionsEnabled, // eslint-disable-line @typescript-eslint/no-unused-vars
   onAddProduct,
   onUpdateProduct,
   onRemoveProduct,
   onEditProduct,
-  onDuplicateProduct,
+  onDuplicateProduct: _onDuplicateProduct, // eslint-disable-line @typescript-eslint/no-unused-vars
   editingProduct,
   productBeingEdited,
   onCancelEdit
@@ -219,7 +219,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'quantity' | 'profit' | 'efficiency' | 'status' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const { saveProduct, loading: savingProduct } = useSavedProducts();
+  const { saveProduct } = useSavedProducts();
 
   const handleSaveProduct = async (product: Product) => {
     const success = await saveProduct(product);
@@ -258,12 +258,13 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           aValue = (a.resalePrice - a.purchasePrice) * a.quantity;
           bValue = (b.resalePrice - b.purchasePrice) * b.quantity;
           break;
-        case 'efficiency':
+        case 'efficiency': {
           const aScore = calculateProductScore(a);
           const bScore = calculateProductScore(b);
           aValue = aScore.efficiencyScore;
           bValue = bScore.efficiencyScore;
           break;
+        }
         case 'status':
           // Sort by assignment status: Assigned first, then Unassigned
           aValue = a.containerId ? 'assigned' : 'unassigned';
@@ -319,7 +320,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
       </div>
 
       {/* Product Form Modal */}
-      <ProductForm
+      <ProductFormRefactored
         isOpen={showNewProductForm}
         onAddProduct={product => {
           onAddProduct(product);
@@ -388,7 +389,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 
       {/* Edit Product Modal */}
       {editingProduct && productBeingEdited && (
-        <ProductForm 
+        <ProductFormRefactored 
           product={productBeingEdited}
           isOpen={true}
           onUpdateProduct={(id, updates) => {

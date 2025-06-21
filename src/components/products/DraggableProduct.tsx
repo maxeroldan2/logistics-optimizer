@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Package, Edit2, Copy, Trash2 } from 'lucide-react';
+import { GripVertical, Edit2, Copy, Trash2 } from 'lucide-react';
 import { Product } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { formatCurrency } from '../../utils/calculations';
@@ -21,8 +21,13 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
   onDelete
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, isDragging } = useDraggable({
     id: product.id,
+    data: {
+      type: 'product',
+      product,
+      containerId: product.containerId,
+    },
   });
   
   const { config, currentShipment } = useAppContext();
@@ -41,9 +46,8 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
           ref={setNodeRef}
           style={style}
           {...attributes}
-          {...listeners}
           className={`
-            flex-grow p-3 rounded-lg border transition-all duration-200 cursor-move bg-white
+            flex-grow p-3 rounded-lg border transition-all duration-200 bg-white
             ${isDragging 
               ? 'border-blue-500 shadow-lg opacity-75 rotate-2 scale-105' 
               : 'border-gray-200 hover:border-blue-300 hover:shadow'
@@ -51,6 +55,14 @@ const DraggableProduct: React.FC<DraggableProductProps> = ({
           `}
         >
           <div className="flex items-center space-x-3">
+            <button
+              ref={setActivatorNodeRef}
+              {...listeners}
+              className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
+              aria-label={`Drag ${product.name}`}
+            >
+              <GripVertical className="h-4 w-4" />
+            </button>
             <div className="flex-shrink-0">
               <ProductIcon className="h-5 w-5 text-blue-600" />
             </div>
